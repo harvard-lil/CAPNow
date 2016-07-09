@@ -1,0 +1,28 @@
+{
+  "name": "firmament-django",
+  "version": "1.0.0",
+  "description": "Firmament - Caselaw Publishing System",
+  "main": "assets/js/index.js",
+  "devDependencies": {
+    "react-dom": "^15.2.0",
+    "react-dropzone": "^3.5.3",
+    "superagent": "^2.0.0",
+    "superagent-django-csrf": "^0.1.3"
+    "babel": "^6.5.2",
+    "babel-core": "^6.10.4",
+    "babel-loader": "^6.2.4",
+    "babel-preset-es2015": "^6.9.0",
+    "babel-preset-react": "^6.11.1",
+    "node-libs-browser": "^1.0.0",
+    "react": "^15.2.0",
+    "react-hot-loader": "^1.3.0",
+    "webpack": "^1.13.1",
+    "webpack-bundle-tracker": "0.0.5",
+    "webpack-dev-server": "^1.14.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

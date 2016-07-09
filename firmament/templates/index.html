@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load render_bundle from webpack_loader %}
+
+{% block content %}
+  <div id="content"></div>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    var createCaseURL = '{% url "api:cases-list" %}';
+    var volumeURL = '{% url "api:volumes-list" %}';
+  </script>
+  {% render_bundle 'main' %}
+{% endblock %}

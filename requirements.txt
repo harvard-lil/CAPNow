@@ -1,0 +1,24 @@
+Django==1.9.7
+
+# docx generation
+pyquery==1.2.13
+#python-docx
+-e git://github.com/jcushman/python-docx.git#egg=python-docx
+
+# API
+django-filter==0.13.0
+djangorestframework==3.3.3
+Markdown==2.6.6
+
+django-model-utils==2.5     # tracking model field changes
+celery==3.1.23
+cloudconvert==1.0.0
+django-webpack-loader==0.3.0
+
+# deployment
+whitenoise==3.2
+dj-database-url==0.4.1
+psycopg2==2.6.1
+Fabric3==1.11.1.post1
+gunicorn==19.6.0
+psycopg2==2.6.1

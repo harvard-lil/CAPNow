@@ -1,0 +1,9 @@
+venv
+*.pyc
+staticfiles
+firmament/settings/settings.py
+node_modules
+media
+db.sqlite3
+webpack-stats.json
+samples
