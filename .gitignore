@@ -7,3 +7,4 @@ media
 db.sqlite3
 webpack-stats.json
 samples
+celerybeat-schedule

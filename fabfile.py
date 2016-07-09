@@ -1,8 +1,12 @@
 import os
+import signal
 
+import sys
 from fabric.api import local
 
 import django
+from subprocess import Popen
+
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'firmament.settings')
 try:
     django.setup()
@@ -14,8 +18,17 @@ def stop():
     local("killall node")
 
 def run():
-    local("node dev_assets_server.js &")
-    local("python manage.py runserver 127.0.0.1:9000")
+    commands = [
+        'node dev_assets_server.js',
+        'celery -A firmament worker --loglevel=info -B'
+    ]
+
+    proc_list = [Popen(command, shell=True, stdin=sys.stdin, stdout=sys.stdout, stderr=sys.stderr) for command in commands]
+    try:
+        local("python manage.py runserver 127.0.0.1:9000")
+    finally:
+        for proc in proc_list:
+            os.kill(proc.pid, signal.SIGKILL)
 
 def init_db():
     from firmament.models import Series
