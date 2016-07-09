@@ -86,15 +86,22 @@ var Volume = React.createClass({
 
 var Case = React.createClass({
   render: function() {
+    var d = this.props.data;
     return (
       <div className="case">
         <div className="row">
-          <div className="col-lg-12"><h5>{this.props.data.citation}</h5></div>
+          <div className="col-lg-12"><h5>{d.citation}</h5></div>
         </div>
         <div className="row">
-          <div className="col-lg-2"><a href={this.props.data.manuscript}>download manuscript</a></div>
-          <div className="col-lg-2"><a href={this.props.data.proof.docx}>download proof .docx</a></div>
-          <div className="col-lg-2"><a href={this.props.data.proof.pdf}>download proof .pdf</a></div>
+          <div className="col-lg-2"><a href={d.manuscript}>download manuscript</a></div>
+          <div className="col-lg-2"><a href={d.proof.docx}>download proof .docx</a></div>
+          <div className="col-lg-2">
+            { d.proof.pdf_status == "generated" ?
+              <a href={d.proof.pdf}>download proof .pdf</a> :
+              d.proof.pdf_status == "pending" ?
+                "PDF generating" : "Generating PDF failed"
+            }
+          </div>
         </div>
       </div>
     );
