@@ -148,13 +148,14 @@ MEDIA_URL = '/media/'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
+CELERY_ALWAYS_EAGER = False
 
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny', #DjangoModelPermissionsOrAnonReadOnly'
-    ]
+    ],
 }
 
 WEBPACK_LOADER = {

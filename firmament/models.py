@@ -1,6 +1,8 @@
 import os
+import PyPDF2
 
 from django.conf import settings
+from django.core.files.base import ContentFile
 from docx import RT
 from model_utils import FieldTracker
 from django.db import models
@@ -9,6 +11,7 @@ from scripts.convert import load_doc, load_part, save_part
 
 
 class Proof(models.Model):
+    timestamp = models.DateTimeField(auto_now_add=True)
     docx = models.FileField(blank=True, null=True)
     pdf = models.FileField(blank=True, null=True)
     pdf_status = models.CharField(max_length=10,
@@ -16,12 +19,18 @@ class Proof(models.Model):
                                     choices=(('pending', 'pending'), ('generated', 'generated'), ('failed', 'failed')),
                                     blank=True, null=True)
 
+    class Meta:
+        ordering = ('-timestamp',)
+
     def save(self, *args, **kwargs):
         new_record = not self.pk
         super(Proof, self).save(*args, **kwargs)
         if new_record:
-            from .tasks import generate_final
-            generate_final.apply_async([self.pk])
+            from .tasks import generate_proof_pdf
+            print("CALLING TASK")
+            generate_proof_pdf.apply_async([self.pk])
+            if settings.CELERY_ALWAYS_EAGER:
+                self.refresh_from_db()
 
     def __str__(self):
         return self.docx.name
@@ -40,8 +49,8 @@ class Volume(models.Model):
     series = models.ForeignKey(Series, related_name='volumes')
     volume_number = models.IntegerField()
 
-    front_matter = models.ForeignKey(Proof, blank=True, null=True, related_name='front_matter_volumes')
-    back_matter = models.ForeignKey(Proof, blank=True, null=True, related_name='back_matter_volumes')
+    front_matter_proofs = models.ManyToManyField(Proof, related_name='front_matter_volumes')
+    back_matter_proofs = models.ManyToManyField(Proof, related_name='back_matter_volumes')
 
     def __str__(self):
         return "%s %s" % (self.volume_number, self.series)
@@ -60,22 +69,44 @@ class Volume(models.Model):
         ### save document
         for header_part, header_el, header_pq in header_parts:
             save_part(header_el, header_part)
-        doc.save(os.path.join(settings.BASE_DIR, "test.docx"))
 
+        proof_docx = ContentFile(b"")
+        doc.save(proof_docx)
+
+        proof = Proof()
+        proof.docx.save("%s Front Matter.docx" % self, proof_docx)
+        proof.save()
+
+        self.front_matter_proofs.add(proof)
+
+    @property
+    def published_cases(self):
+        return self.cases.filter(status="published")
 
 
 class Case(models.Model):
     volume = models.ForeignKey(Volume, related_name='cases')
     page_number = models.IntegerField()
+    last_page_number = models.IntegerField(blank=True, null=True)
     short_name = models.CharField(max_length=1024)
     year = models.IntegerField()
     manuscript = models.FileField()
-    proof = models.ForeignKey(Proof, blank=True, null=True)
+    proofs = models.ManyToManyField(Proof, related_name='cases')
+    status = models.CharField(max_length=10,
+                              default='draft',
+                              choices=(('draft', 'draft'), ('published', 'published'), ('withdrawn', 'withdrawn')),
+                              blank=True, null=True)
 
     tracker = FieldTracker()
 
     def citation(self):
-        return "%s, %s %s (%s)" % (self.short_name, self.volume, self.page_number, self.year)
+        return "%s, %s %s-%s (%s)" % (self.short_name, self.volume, self.page_number, self.last_page_number or "?", self.year)
 
     def __str__(self):
         return self.citation()
+
+    def update_last_page_number(self, proof):
+        reader = PyPDF2.PdfFileReader(proof.pdf.file)
+        self.last_page_number = self.page_number + reader.getNumPages() - 1
+        self.save()
+

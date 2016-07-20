@@ -10,14 +10,20 @@ from scripts.convert import convert
 class ProofSerializer(serializers.ModelSerializer):
     class Meta:
         model = Proof
-        fields = ('docx', 'pdf', 'pdf_status')
+        fields = ('timestamp', 'docx', 'pdf', 'pdf_status')
+        extra_kwargs = {
+            "docx": {"required": False,},
+            "timestamp": {"read_only": True},
+            "pdf": {"read_only": True},
+            "pdf_status": {"read_only": True},
+        }
 
 class CaseSerializer(serializers.ModelSerializer):
-    proof = ProofSerializer(required=False)
+    proofs = ProofSerializer(required=False, many=True, read_only=True)
 
     class Meta:
         model = Case
-        fields = ('id', 'page_number', 'short_name', 'year', 'manuscript', 'proof', 'citation')
+        fields = ('id', 'page_number', 'last_page_number', 'short_name', 'year', 'manuscript', 'proofs', 'citation', 'status')
         extra_kwargs = {
             "page_number": {"required": False,},
             "year": {"required": False,},
@@ -26,6 +32,8 @@ class CaseSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         if not 'manuscript' in data:
+            if self.partial:
+                return data
             raise serializers.ValidationError("Manuscript is required")
 
         manuscript = data['manuscript']
@@ -54,18 +62,23 @@ class CaseSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data['volume'].save()
-        validated_data['proof'] = Proof()
-        validated_data['proof'].docx.save(
+        proof_docx = validated_data.pop('proof_docx')
+        instance = super(CaseSerializer, self).create(validated_data)
+        proof = Proof()
+        proof.docx.save(
             validated_data['manuscript'].name.replace('.docx', '.proof.docx'),
-            validated_data.pop('proof_docx'))
-        return super(CaseSerializer, self).create(validated_data)
+            proof_docx)
+        proof.save()
+        instance.proofs = [proof]
+        return instance
+
 
 class VolumeSerializer(serializers.ModelSerializer):
     series = serializers.StringRelatedField()
     cases = CaseSerializer(many=True, read_only=True)
-    front_matter = ProofSerializer()
-    back_matter = ProofSerializer()
+    front_matter_proofs = ProofSerializer(many=True)
+    back_matter_proofs = ProofSerializer(many=True)
 
     class Meta:
         model = Volume
-        fields = ('id', 'series', 'volume_number', 'front_matter', 'back_matter', 'cases')
+        fields = ('id', 'series', 'volume_number', 'front_matter_proofs', 'back_matter_proofs', 'cases')

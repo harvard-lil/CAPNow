@@ -1,7 +1,14 @@
 var path = require("path");
 var webpack = require('webpack');
 var BundleTracker = require('webpack-bundle-tracker');
+const autoprefixer = require('autoprefixer');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
+const sassLoaders = [
+  'css-loader',
+  'postcss-loader',
+  'sass-loader?includePaths[]=' + path.resolve(__dirname, './assets')
+];
 
 module.exports = {
   context: __dirname,
@@ -20,6 +27,13 @@ module.exports = {
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoErrorsPlugin(), // don't reload if there is an error
     new BundleTracker({filename: './webpack-stats.json'}),
+    new ExtractTextPlugin('[name].css')
+  ],
+
+  postcss: [
+    autoprefixer({
+      browsers: ['last 2 versions']
+    })
   ],
 
   module: {
@@ -30,11 +44,16 @@ module.exports = {
         exclude: /node_modules/,
         loaders: ['react-hot', 'babel?presets[]=es2015&presets[]=react']
       },
+      {
+        test: /\.scss$/,
+        loader: ExtractTextPlugin.extract('style-loader', sassLoaders.join('!'))
+      }
     ],
   },
 
   resolve: {
     modulesDirectories: ['node_modules', 'bower_components'],
-    extensions: ['', '.js', '.jsx']
+    extensions: ['', '.js', '.jsx', '.scss'],
+    root: [path.join(__dirname, './assets')]
   },
 }

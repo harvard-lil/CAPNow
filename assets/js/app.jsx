@@ -1,23 +1,72 @@
+import 'stylesheets/app'
+
 var React = require('react');
 var Dropzone = require('react-dropzone');
 var request = require('superagent');
-
 require('superagent-django-csrf');
+
+// monkey-patch request with universal settings
+var _request_end = request.Request.prototype.end;
+request.Request.prototype.end = function(fn) {
+  this.accept('json');
+  return _request_end.call(this, function(err, res){
+    if(err){
+      console.log("Error submitting case: ", err)
+    }
+    if(fn)
+      fn(err, res);
+  });
+};
+
+function getProofDivs(proof, onDropURL){
+  function onDrop(files){
+    request.post(onDropURL)
+      .attach("docx", files[0])
+      .end();
+  }
+
+  return (
+    <div>
+      <div className="col-sm-2">{ proof ? <a href={proof.docx}>download proof .docx</a> : "" }</div>
+      <div className="col-sm-2">
+        { proof ?
+            proof.pdf_status == "generated" ?
+              <a href={proof.pdf}>download proof .pdf</a> :
+            proof.pdf_status == "pending" ?
+              "PDF generating" :
+              "Generating PDF failed" :
+            ""
+        }
+      </div>
+      <div className="col-sm-2">
+        <Dropzone
+          ref="dropzone"
+          onDrop={onDrop}
+          multiple={false}
+          accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          disablePreview={true}
+          className="drop-target drop-target-small"
+          activeClassName="drop-target-active"
+          rejectClassName="drop-target-rejected"
+        >
+          <p>Replace proof</p>
+        </Dropzone>
+      </div>
+    </div>
+  );
+}
 
 var VolumeBox = React.createClass({
   loadVolumesFromServer: function() {
-    request.get(this.props.url).end((err, res)=>{
-      if(err){
-        console.error(this.props.url, err.toString());
-      }else{
+    request.get(this.props.url)
+      .end((err, res)=>{
+      if(!err){
         this.loadInterval && this.setState({data: res.body});
       }
     });
   },
   updateStateData: (data) => {
     this.setState({data: data})
-  },
-  handleCaseSubmit: function(caseData) {
   },
   getInitialState: function() {
     return {data: []};
@@ -64,17 +113,55 @@ var VolumeList = React.createClass({
 });
 
 var Volume = React.createClass({
+  endpointURL: function(){
+    return volumeURL+this.props.data.id+"/";
+  },
+
+  generateFrontMatter: function(){
+    request.post(this.endpointURL()+"front_matter_proofs/")
+      .end();
+  },
+
+  exportVolume: function(){
+    window.open(this.endpointURL()+"export/", "_blank");
+  },
+
   render: function() {
     var caseNodes = this.props.data.cases.map(function(caseData) {
       return (
         <Case key={caseData.id} data={caseData}/>
       );
     });
+    var frontMatter = this.props.data.front_matter_proofs[0];
     return (
       <div className="volume">
         <div className="row">
           <div className="col-lg-12">
             <h4>{this.props.data.volume_number} {this.props.data.series}</h4>
+            <div className="volume-sub-row">
+              <div className="row">
+                <div className="col-sm-12">
+                  <button className="btn btn-sm btn-outline-primary" onClick={this.exportVolume}>Export as Book</button>
+                </div>
+              </div>
+            </div>
+
+            <div className="front-matter volume-sub-row">
+              <div className="row">
+                <div className="col-sm-12"><h5>Front Matter</h5></div>
+              </div>
+              <div className="row">
+                <div className="col-sm-2">
+                  <button className="btn btn-sm btn-outline-primary" onClick={this.generateFrontMatter}>{ frontMatter ? "Regenerate" : "Generate" }</button>
+                </div>
+
+                {
+                  frontMatter ?
+                    getProofDivs(frontMatter, this.endpointURL()+"front_matter_proofs/") :
+                    ""
+                }
+              </div>
+            </div>
 
             {caseNodes}
           </div>
@@ -85,23 +172,42 @@ var Volume = React.createClass({
 });
 
 var Case = React.createClass({
+  endpointURL: function(){
+    return createCaseURL+this.props.data.id+"/";
+  },
+
+  onPublish: function(){
+    var oldState = this.state.status;
+    this.setState({status: "published"});
+    request.patch(this.endpointURL())
+      .send({status: "published"})
+      .end((err, res)=>{
+        if(err){
+          this.setState({status: oldState});
+        }
+      });
+  },
+
+  getInitialState: function () {
+			return {status: this.props.data.status};
+  },
+
   render: function() {
     var d = this.props.data;
+    var proof = d.proofs[0];
     return (
-      <div className="case">
+      <div className="case volume-sub-row">
         <div className="row">
-          <div className="col-lg-12"><h5>{d.citation}</h5></div>
+          <div className="col-sm-12"><h5>{d.citation}</h5></div>
         </div>
         <div className="row">
-          <div className="col-lg-2"><a href={d.manuscript}>download manuscript</a></div>
-          <div className="col-lg-2"><a href={d.proof.docx}>download proof .docx</a></div>
-          <div className="col-lg-2">
-            { d.proof.pdf_status == "generated" ?
-              <a href={d.proof.pdf}>download proof .pdf</a> :
-              d.proof.pdf_status == "pending" ?
-                "PDF generating" : "Generating PDF failed"
-            }
-          </div>
+          <div className="col-sm-2"><a href={d.manuscript}>download manuscript</a></div>
+          {getProofDivs(proof, this.endpointURL()+"proofs/")}
+          <div className="col-sm-2">{
+            this.state.status == "draft" ?
+              <button className="btn btn-sm btn-outline-primary" onClick={this.onPublish}>Publish</button> :
+              this.state.status
+          }</div>
         </div>
       </div>
     );
@@ -116,15 +222,9 @@ var CaseForm = React.createClass({
   },
 
   onDrop: function(files){
-    var req = request.post(createCaseURL);
-    files.forEach((file)=> {
-      req.attach("manuscript", file);
-    });
-    req.end((err, res)=>{
-      if(err){
-        console.log("Error submitting case: ", err)
-      }
-    });
+    request.post(createCaseURL)
+      .attach("manuscript", files[0])
+      .end();
   },
 
   render: function () {
@@ -132,29 +232,16 @@ var CaseForm = React.createClass({
       <div className="caseForm">
 
         <div className="row">
-          <div className="col-lg-12">
+          <div className="col-lg-12" style={{padding:'3em'}}>
             <Dropzone
               ref="dropzone"
               onDrop={this.onDrop}
               multiple={false}
               accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
               disablePreview={true}
-              style={{
-                width: "100%",
-                borderWidth: 2,
-                borderColor: '#666',
-                borderStyle: 'dashed',
-                borderRadius: 5,
-                padding: "1em"
-              }}
-              activeStyle={{
-                borderStyle: 'solid',
-                backgroundColor: '#eee'
-              }}
-              rejectStyle={{
-                borderStyle: 'solid',
-                backgroundColor: '#ffdddd'
-              }}
+              className="drop-target"
+              activeClassName="drop-target-active"
+              rejectClassName="drop-target-rejected"
             >
               <h2>Upload new case</h2>
               <div>Click here to choose a case to upload, or drag case here.</div>

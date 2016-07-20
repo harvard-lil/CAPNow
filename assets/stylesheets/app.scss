@@ -1,0 +1,33 @@
+.volume{
+  margin-bottom: 2em;
+}
+.volume-sub-row{
+  margin-bottom: 1em;
+  margin-left: 1em;
+}
+
+.drop-target {
+  width: 100%;
+  border-width: 2px;
+  border-color: #666;
+  border-style: dashed;
+  border-radius: 5px;
+  padding: 1em;
+  cursor: pointer;
+}
+.drop-target-active {
+  border-style: solid;
+  background-color: #eee;
+}
+.drop-target-rejected {
+  border-style: solid;
+  background-color: #ffdddd;
+  cursor: no-drop;
+}
+.drop-target-small {
+  padding: 0;
+  p {
+    margin: 0;
+    text-align: center;
+  }
+}

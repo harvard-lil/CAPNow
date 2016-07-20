@@ -5,34 +5,44 @@ import cloudconvert
 from django.conf import settings
 from django.core.files import File
 
-from firmament.models import Proof
+from firmament.models import Proof, Case
 
 
 @shared_task
-def generate_final(proof_id):
+def generate_proof_pdf(proof_id):
+    print("TASK CALLED")
     proof = Proof.objects.get(pk=proof_id)
-    if not proof.docx:
-        return
+    try:
+        if not proof.docx:
+            return
 
-    print("Converting proof to PDF.")
+        print("Converting proof id=%s, file=%s to PDF." % (proof.id, proof.docx.name))
 
-    api = cloudconvert.Api(settings.CLOUDCONVERT_API_KEY)
+        api = cloudconvert.Api(settings.CLOUDCONVERT_API_KEY)
 
-    process = api.convert({
-        "inputformat": "docx",
-        "outputformat": "pdf",
-        "input": "upload",
-        "converteroptions": {
-            "pdf_a": True,
-        },
-        "file": proof.docx.file.file  # unwrap FieldFile -> File -> file
-    })
-    process.wait()
+        process = api.convert({
+            "inputformat": "docx",
+            "outputformat": "pdf",
+            "input": "upload",
+            "converteroptions": {
+                "pdf_a": True,
+            },
+            "file": proof.docx.file.file  # unwrap FieldFile -> File -> file
+        })
+        process.wait()
 
-    temp_file = tempfile.NamedTemporaryFile()
-    process.download(temp_file.name)
-    proof.pdf.save(proof.docx.name.replace('.docx', '.pdf'), File(temp_file))
-    proof.pdf_status = "generated"
-    proof.save()
+        temp_file = tempfile.NamedTemporaryFile()
+        process.download(temp_file.name)
+        proof.pdf.save(proof.docx.name.replace('.docx', '.pdf'), File(temp_file))
+        proof.pdf_status = "generated"
+        proof.save()
 
-    print("Converted! %s status = %s" % (proof.id, proof.pdf_status))
+        print("Converted! %s status = %s" % (proof.id, proof.pdf_status))
+
+        for case in proof.cases.all():
+            case.update_last_page_number(proof)
+
+    except Exception as e:
+        proof.pdf_status = "failed"
+        proof.save()
+        raise
