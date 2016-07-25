@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'firmament',
 
     'rest_framework',
-    'django_extensions',
 
     'webpack_loader',
 ]
