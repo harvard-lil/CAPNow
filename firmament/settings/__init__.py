@@ -10,3 +10,10 @@ except ImportError as e:
 
 import django_env_overrides
 django_env_overrides.apply_to(globals())
+
+
+if not DEBUG:
+    WEBPACK_LOADER['DEFAULT'].update({
+        'BUNDLE_DIR_NAME': 'dist/',
+        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats-prod.json'),
+    })
