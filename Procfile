@@ -1,1 +1,1 @@
-web: gunicorn firmament.wsgi
+web: gunicorn firmament.wsgi --log-file -

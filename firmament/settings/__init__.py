@@ -7,3 +7,6 @@ except ImportError as e:
         from .settings_common import *
     else:
         raise
+
+import django_env_overrides
+django_env_overrides.apply_to(globals())
