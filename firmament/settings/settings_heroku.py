@@ -23,10 +23,3 @@ BROKER_HEARTBEAT = 30
 CELERY_SEND_EVENTS = False  # on the free CloudAMQP plan, celery events rapidly eat up our monthly message quota
 CELERY_RESULT_BACKEND = env('REDIS_URL')
 CELERYD_HIJACK_ROOT_LOGGER = False
-
-# logging
-LOGGING['handlers']['default'] = {
-    'level': 'INFO',
-    'class': 'logging.StreamHandler',
-    'formatter': 'standard',
-}
