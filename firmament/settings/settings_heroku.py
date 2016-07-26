@@ -5,10 +5,16 @@ env = environ.Env()
 
 DEBUG = False
 
+# database
 DATABASES['default'] = env.db()
 
+# S3 storage
+AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = 'cap-firmament'
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 
+# static assets
 WEBPACK_LOADER['DEFAULT'].update({
     'BUNDLE_DIR_NAME': 'dist/',
     'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats-prod.json'),
