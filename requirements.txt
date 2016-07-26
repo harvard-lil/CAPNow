@@ -30,3 +30,4 @@ django-env-overrides==0.1.0
 # heroku
 django_storages==1.4.1
 boto==2.42.0
+redis==2.10.5
