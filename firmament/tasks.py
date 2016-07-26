@@ -1,4 +1,5 @@
 import tempfile
+from io import BufferedReader
 
 from celery import shared_task
 import cloudconvert
@@ -20,6 +21,8 @@ def generate_proof_pdf(proof_id):
 
         api = cloudconvert.Api(settings.CLOUDCONVERT_API_KEY)
 
+        print("FILE TYPE", proof.docx.file.file)
+
         process = api.convert({
             "inputformat": "docx",
             "outputformat": "pdf",
@@ -27,7 +30,7 @@ def generate_proof_pdf(proof_id):
             "converteroptions": {
                 "pdf_a": True,
             },
-            "file": proof.docx.file.file  # unwrap FieldFile -> File -> file
+            "file": BufferedReader(proof.docx.file.file)  # cloudconvert requires that file isinstance(BufferedReader)
         })
         process.wait()
 
