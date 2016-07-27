@@ -1,3 +1,4 @@
+import os
 import tempfile
 from io import BufferedReader
 
@@ -6,7 +7,7 @@ import cloudconvert
 from django.conf import settings
 from django.core.files import File
 
-from firmament.models import Proof, Case
+from firmament.models import Proof
 
 
 @shared_task
@@ -21,22 +22,22 @@ def generate_proof_pdf(proof_id):
 
         api = cloudconvert.Api(settings.CLOUDCONVERT_API_KEY)
 
-        raw_file = proof.docx.file.file
-        # extra unwrapping for S3 storage backend
-        if hasattr(raw_file, '_file'):
-            raw_file = BufferedReader(raw_file._file)  # cloudconvert requires that file isinstance(BufferedReader)
-            raw_file.name = proof.docx.name
+        # convert proof.docx to a named BufferedReader by writing to temp dir -- required for cloudconvert
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_path = os.path.join(tmp_dir, proof.docx.name)
+            open(tmp_path, 'wb').write(proof.docx.file.read())
+            docx = BufferedReader(open(tmp_path, 'rb'))
 
-        process = api.convert({
-            "inputformat": "docx",
-            "outputformat": "pdf",
-            "input": "upload",
-            "converteroptions": {
-                "pdf_a": True,
-            },
-            "file": raw_file
-        })
-        process.wait()
+            process = api.convert({
+                "inputformat": "docx",
+                "outputformat": "pdf",
+                "input": "upload",
+                "converteroptions": {
+                    "pdf_a": True,
+                },
+                "file": docx
+            })
+            process.wait()
 
         temp_file = tempfile.NamedTemporaryFile()
         process.download(temp_file.name)
