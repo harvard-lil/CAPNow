@@ -24,7 +24,8 @@ def generate_proof_pdf(proof_id):
         raw_file = proof.docx.file.file
         # extra unwrapping for S3 storage backend
         if hasattr(raw_file, '_file'):
-            raw_file = raw_file._file
+            raw_file = BufferedReader(raw_file._file)  # cloudconvert requires that file isinstance(BufferedReader)
+            raw_file.name = proof.docx.name
 
         process = api.convert({
             "inputformat": "docx",
@@ -33,7 +34,7 @@ def generate_proof_pdf(proof_id):
             "converteroptions": {
                 "pdf_a": True,
             },
-            "file": BufferedReader(raw_file)  # cloudconvert requires that file isinstance(BufferedReader)
+            "file": raw_file
         })
         process.wait()
 
