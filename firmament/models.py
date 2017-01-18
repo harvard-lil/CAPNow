@@ -3,12 +3,44 @@ import PyPDF2
 
 from django.conf import settings
 from django.core.files.base import ContentFile
+from django.utils import timezone
 from docx import RT
 from model_utils import FieldTracker
 from django.db import models
 
 from scripts.convert import load_doc, load_part, save_part
 
+
+### HELPERS ###
+
+class DeletableManager(models.Manager):
+    """
+        Manager that excludes results where user_deleted=True by default.
+    """
+    def get_queryset(self):
+        # exclude deleted entries by default
+        return super(DeletableManager, self).get_queryset().filter(user_deleted=False)
+
+    def all_with_deleted(self):
+        return super(DeletableManager, self).get_queryset()
+
+
+class DeletableModel(models.Model):
+    """
+        Abstract base class that lets a model track deletion.
+    """
+    user_deleted = models.BooleanField(default=False, verbose_name="Deleted by user")
+    user_deleted_timestamp = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        abstract = True
+
+    def safe_delete(self):
+        self.user_deleted = True
+        self.user_deleted_timestamp = timezone.now()
+
+
+### MODELS ###
 
 class Proof(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
@@ -84,7 +116,7 @@ class Volume(models.Model):
         return self.cases.filter(status="published")
 
 
-class Case(models.Model):
+class Case(DeletableModel):
     volume = models.ForeignKey(Volume, related_name='cases')
     page_number = models.IntegerField()
     last_page_number = models.IntegerField(blank=True, null=True)
@@ -98,6 +130,7 @@ class Case(models.Model):
                               blank=True, null=True)
 
     tracker = FieldTracker()
+    objects = DeletableManager()
 
     def citation(self):
         return "%s, %s %s-%s (%s)" % (self.short_name, self.volume, self.page_number, self.last_page_number or "?", self.year)

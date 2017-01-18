@@ -188,6 +188,12 @@ var Case = React.createClass({
       });
   },
 
+  onDelete: function(){
+    request.delete(this.endpointURL())
+      .send()
+      .end();
+  },
+
   getInitialState: function () {
 			return {status: this.props.data.status};
   },
@@ -208,6 +214,7 @@ var Case = React.createClass({
               <button className="btn btn-sm btn-outline-primary" onClick={this.onPublish}>Publish</button> :
               this.state.status
           }</div>
+          {/* <div className="col-sm-12"><button className="btn btn-sm btn-outline-danger" onClick={this.onDelete}>Delete</button></div> */}
         </div>
       </div>
     );

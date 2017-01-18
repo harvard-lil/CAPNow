@@ -52,6 +52,10 @@ class CaseViewSet(viewsets.ModelViewSet):
         kwargs['partial'] = True
         return self.update(request, *args, **kwargs)
 
+    def perform_destroy(self, instance):
+        instance.safe_delete()
+        instance.save()
+
 class NestedProofViewSet(viewsets.ModelViewSet):
     queryset = Proof.objects.all()
     serializer_class = ProofSerializer
