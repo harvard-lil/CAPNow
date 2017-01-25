@@ -26,8 +26,8 @@ function getProofDivs(proof, onDropURL){
   }
 
   return (
-    <div>
-      <div className="col-sm-2">{ proof ? <a href={proof.docx}>download proof .docx</a> : "" }</div>
+    [
+      <div className="col-sm-2">{ proof ? <a href={proof.docx}>download proof .docx</a> : "" }</div>,
       <div className="col-sm-2">
         { proof ?
             proof.pdf_status == "generated" ?
@@ -37,7 +37,7 @@ function getProofDivs(proof, onDropURL){
               "Generating PDF failed" :
             ""
         }
-      </div>
+      </div>,
       <div className="col-sm-2">
         <Dropzone
           ref="dropzone"
@@ -52,7 +52,7 @@ function getProofDivs(proof, onDropURL){
           <p>Replace proof</p>
         </Dropzone>
       </div>
-    </div>
+    ]
   );
 }
 
