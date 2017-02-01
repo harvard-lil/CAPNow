@@ -23,11 +23,11 @@ class CaseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Case
-        fields = ('id', 'page_number', 'last_page_number', 'short_name', 'year', 'manuscript', 'proofs', 'citation', 'status')
+        fields = ('id', 'first_page', 'last_page', 'name_abbreviation', 'year', 'manuscript', 'proofs', 'citation', 'publication_status')
         extra_kwargs = {
-            "page_number": {"required": False,},
+            "first_page": {"required": False,},
             "year": {"required": False,},
-            "short_name": {"required": False,},
+            "name_abbreviation": {"required": False,},
         }
 
     def validate(self, data):
@@ -42,10 +42,10 @@ class CaseSerializer(serializers.ModelSerializer):
         m = re.match(r'(.+?), (\d+) (.*?) (\d+) \((\d{4})\).docx', manuscript.name)
         if not m:
             raise serializers.ValidationError("File name must match this pattern: 123 Mass. 456 (2015).docx")
-        short_name, volume_number, series_name, page_number, year = m.groups()
+        name_abbreviation, volume_number, series_name, first_page, year = m.groups()
 
         try:
-            series = Series.objects.get(short_name=series_name)
+            series = Series.objects.get(name_abbreviation=series_name)
         except Series.DoesNotExist:
             raise serializers.ValidationError("Unrecognized series name.")
 
@@ -55,9 +55,9 @@ class CaseSerializer(serializers.ModelSerializer):
             volume = Volume(volume_number=volume_number, series=series)
 
         proof_docx = ContentFile(b"")
-        convert(manuscript, proof_docx, short_name, " ".join([volume_number, series_name, page_number]), year)
+        convert(manuscript, proof_docx, name_abbreviation, " ".join([volume_number, series_name, first_page]), year)
 
-        return dict(data, volume=volume, short_name=short_name, page_number=page_number,
+        return dict(data, volume=volume, name_abbreviation=name_abbreviation, first_page=first_page,
                         year=year, proof_docx=proof_docx)
 
     def create(self, validated_data):
