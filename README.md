@@ -5,7 +5,33 @@ A secure and trusted platform that empowers courts to quickly and easily publish
 
 ## Development
 
+CAPNow requires Python 3.
+
+### Setup your vitual env and install the requirements
+`mkvirtualenv capnow; pip install -r requirements.txt`
+
+### Setup webpack
+`npm install`
+
 If you change JS or CSS, then before commiting, run `npm run build` to build the production assets.
+
+### Local settings file
+Setup your local settings file
+`cd settings; touch settings.py`
+
+with about these contents
+```
+from .settings_common import *
+
+SECRET_KEY = 'your key'
+CLOUDCONVERT_API_KEY = 'your key'
+```
+
+### Create the DB and run Djangp
+`fab init_db; fab run`
+
+### Yay!
+Open [the local address](http://localhost:9001/) in your browser and let the hacking begin!
 
 
 ## License
