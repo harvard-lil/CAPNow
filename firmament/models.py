@@ -75,7 +75,7 @@ class Series(models.Model):
         verbose_name_plural = 'Series'
 
     def __str__(self):
-        return self.short_name
+        return self.name_abbreviation
 
 class Volume(models.Model):
     series = models.ForeignKey(Series, related_name='volumes')
@@ -146,7 +146,7 @@ class Case(DeletableModel):
     def __str__(self):
         return self.citation()
 
-    def update_last_page(self, proof):
+    def update_last_page_number(self, proof):
         reader = PyPDF2.PdfFileReader(proof.pdf.file)
         self.last_page = self.first_page + reader.getNumPages() - 1
         self.save()
