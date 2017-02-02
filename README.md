@@ -5,7 +5,24 @@ A secure and trusted platform that empowers courts to quickly and easily publish
 
 ## Development
 
+### Setup your vitual env and install the requirements
+`mkvirtualenv capnow; pip install -r requirements.txt`
+
+### Setup webpack
+`npm install`
+
 If you change JS or CSS, then before commiting, run `npm run build` to build the production assets.
+
+### Configure settings?
+`do we need settings.py for local settings? probably`
+
+### Start django up
+`fab run`
+
+### Yay!
+Open [the local address](http://localhost:9001/) in your browser and let the hacking begin!
+
+
 
 
 ## License
