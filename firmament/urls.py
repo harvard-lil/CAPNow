@@ -18,15 +18,20 @@ from django.conf.urls import url, include
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic import TemplateView
+from django.contrib.auth import views as auth_views
+from django.contrib.auth.decorators import login_required
 
 from . import views
+
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^api/', include('api.urls', namespace='api')),
+    url(r'^login/$', auth_views.login, name='login'),
 
     url(r'^public$', views.public, name='public'),
-    url(r'^$', TemplateView.as_view(template_name='index.html'), name='home')
+
+    url(r'^$', login_required(TemplateView.as_view(template_name='index.html')), name='home')
 ]
 
 if settings.DEBUG:
