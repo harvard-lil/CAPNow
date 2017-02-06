@@ -6,5 +6,8 @@ node_modules
 media
 db.sqlite3
 webpack-stats.json
+webpack-stats-prod.json
+package.json
 samples
 celerybeat-schedule
+assets/*
