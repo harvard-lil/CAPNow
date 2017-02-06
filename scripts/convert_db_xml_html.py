@@ -24,11 +24,13 @@ def get_elements:
     # casename
     par_num = 0
     casename_string = get_casename_string(paragraphs[par_num])
+    casename = Casename(casename_string)
+    parties = Parties(casename_string)
 
     # date
     par_num = skip_blanks(paragraphs, par_num)
-    date_stripped = strip_xml(paragraphs[par_num].xml)
-    decision_date = get_latest_date(date_stripped)
+    date_string = process_xml(paragraphs[par_num])
+    date = Date(date_string)
 
     # judges
     par_num = skip_blanks(paragraphs, par_num)
@@ -109,12 +111,51 @@ class Footnote:
     number = None
     content = ""
 
-    def format_xml(self):
+    def format_for_xml(self):
         return "<footnotemark>%s</footnotemark>" % self.number
 
     def __init__(self, xml):
         footnote_id = re.search(r'footnoteReference\s+w\:id\=\"(\d+)\"', xml)
         self.number=int(footnote_id.groups()[0])
+
+class Date:
+    def get_enddate_str(self, raw_str):
+        return raw_str.split(' - ')[1]
+
+    def get_startdate_str(self, raw_str):
+        return re.sub(r'^\w+\.\s+', '', raw_str.split(' - ')[0])
+
+    def format_for_xml(self, raw_str):
+        """
+        Examples:
+        <decisiondate>1997-05-19</decisiondate>
+        in <casebody>:
+        <decisiondate id="AML" pgmap="66">May 19, 1997.</decisiondate>
+        <otherdate id="A6q" pgmap="66">January 9, 1997. -</otherdate>
+        """
+
+        enddate = self.get_enddate_str(raw_str)
+        decisiondate_casebody = tag.decisiondate(enddate)
+
+        datetime_obj = datetime.strptime(enddate, "%B %d, %Y.")
+        decisiondate = tag.decisiondate(datetime.strftime(datetime_obj, "%Y-%d-%m"))
+
+        otherdate = tag.otherdate(self.get_startdate_str(raw_str))
+        return decisiondate, decisiondate_casebody, otherdate
+
+    def format_for_html(self, raw_str):
+        enddate = self.get_enddate_str(raw_str)
+        startdate = self.get_startdate_str(raw_str)
+        dates = startdate + " - " + enddate
+        return tag.h3(dates)
+
+    def format_for_db(self, raw_str):
+        return datetime.strptime(self.get_enddate_str(raw_str), "%B %d, %Y.")
+
+    def __init__(self, raw_str):
+        self.xml = self.format_for_xml(raw_str)
+        self.db_str = self.format_for_db(raw_str)
+        self.html = self.format_for_html(raw_str)
 
 def get_bookmarks(bookmark_pq):
     bookmarks = []
@@ -171,24 +212,3 @@ while has_text(paragraphs[par_num]):
     import ipdb; ipdb.set_trace()
     paragraphs[par_num].style = 'Headnote'
     par_num += 2
-
-
-#
-# def get_casename(par):
-#     parties = []
-#     party = Party()
-#     for run in pq(par)('w|r'):
-#         if run.style and run.style == 'FootnoteReference':
-#             footnote_id = re.search(r'footnoteReference\s+w\:id\=\"(\d+)\"', run.xml)
-#             party.footnote = int(footnote_id.groups()[0])
-#         elif run.text == 'vs' or run.text == 'v':
-#             parties.append(party)
-#             party = Party()
-#         else:
-#             name = re.search(r'\w{1,}\s?', run.text)
-#             if name:
-#                 party.name += run.text
-#     parties.append(party)
-#     for p in parties:
-#          nada, p.name, p.details = re.split(r'([A-Z](?:[A-Z.\-_]\s?)+)', p.name)
-#     return parties
