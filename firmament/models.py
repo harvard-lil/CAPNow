@@ -120,9 +120,13 @@ class Court(models.Model):
     name_abbreviation = models.CharField(max_length=64, null=True)
     jurisdiction = models.CharField(max_length=24, null=True)
 
+class Judge(models.Model):
+    name = models.CharField(max_length=128)
+
 class Case(DeletableModel):
     volume = models.ForeignKey(Volume, related_name='cases')
     court = models.ForeignKey(Court, related_name='cases', blank=True, null=True)
+    headnotes = models.TextField(null=True)
     name = models.CharField(max_length=1024, null=True)
     name_abbreviation = models.CharField(max_length=256, null=True)
     year = models.IntegerField()
