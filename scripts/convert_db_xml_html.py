@@ -39,7 +39,8 @@ def get_elements:
 
     # categories
     par_num = skip_blanks(paragraphs, par_num)
-    categories = process_xml(paragraphs[par_num])
+    categories_string = process_xml(paragraphs[par_num])
+    categories = Categories(categories_string)
 
     # headnotes
     headnotes, par_num = get_headnotes(par_num)
@@ -156,6 +157,17 @@ class Date:
     def __init__(self, raw_str):
         self.xml = self.format_for_xml(raw_str)
         self.db_str = self.format_for_db(raw_str)
+        self.html = self.format_for_html(raw_str)
+
+class Categories:
+    def format_for_html(self, raw_str):
+        return tag.p(raw_str)
+
+    def format_for_xml(self, raw_str):
+        return tag.categories(raw_str)
+
+    def __init__(self, raw_str):
+        self.xml = self.format_for_xml(raw_str)
         self.html = self.format_for_html(raw_str)
 
 class Judges:
