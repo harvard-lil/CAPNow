@@ -10,6 +10,8 @@ from datetime import datetime
 source_path = "/Users/aaizman/Documents/firmament/docs/originals/Bayless v. TTS Trio Corporation, 474 Mass. 1 (2016).docx"
 document = Document(source_path)
 source_doc, source_pq = document, pq(document.element, parser='xml')
+footnotes_part, footnotes_el, footnotes_pq = load_part(source_doc.part.part_related_by(RT.FOOTNOTES))
+
 template_path = 'sources/Case Template.docx'
 
 def get_elements():
@@ -17,6 +19,8 @@ def get_elements():
 
     pq(source_pq('w|p')[:4]).remove()
     paragraphs = source_pq('w|p')
+
+    footnotes = process_footnotes(footnotes_pq)
     bookmarks = get_bookmarks(source_pq("w|highlight[w|val='yellow']"))
 
     # casename

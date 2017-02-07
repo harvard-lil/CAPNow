@@ -43,7 +43,6 @@ class Casename:
 
 class Footnote:
     number = None
-    content = ""
 
     def format_for_xml(self):
         return "<footnotemark>%s</footnotemark>" % self.number
@@ -51,6 +50,20 @@ class Footnote:
     def __init__(self, xml):
         footnote_id = re.search(r'footnoteReference\s+w\:id\=\"(\d+)\"', xml)
         self.number=int(footnote_id.groups()[0])
+
+class FootnoteContent:
+    number = None
+
+    def format_for_xml(self, raw_str):
+        return "<footnote label=" + str(self.number) + ">" + tag.p(raw_str)  + "</footnote>"
+
+    def add_to_xml(self, raw_str):
+        footnote_parts = self.xml.split("</p></footnote>")
+        self.xml = footnote_parts[0] + "</p>" + tag.p(raw_str) + "</footnote>"
+
+    def __init__(self, raw_str, num):
+        self.number = num
+        self.xml = self.format_for_xml(raw_str)
 
 class Date:
     def get_enddate_str(self, raw_str):
