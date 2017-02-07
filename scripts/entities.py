@@ -19,13 +19,16 @@ class Casename:
     def get_footnote_num(self, footnote_str):
         return re.search(r"\d+", footnote_str).group()
 
-    def format_for_db(self, raw_str):
+    def format_for_db(self, raw_str, name_abbreviation):
         name = re.sub(r"<footnotemark>\d+<\/footnotemark>", "", raw_str)
-        return re.sub(r"[A-Z][A-Z]+", lambda entity: entity.group().title(), name)
+        return re.sub(r"[A-Z][A-Z]+", lambda entity: entity.group().title(), name), name_abbreviation
 
-    def format_for_xml(self, raw_str):
+    def format_for_xml(self, raw_str, name_abbr_str):
         name = re.sub(r"<footnotemark>\d+<\/footnotemark>", "", raw_str)
         title = re.sub(r"[A-Z][A-Z]+", lambda entity: entity.group().title(), name)
+        name_xml = tag.name(title)
+        name_parts = name_xml.split('<name')
+        name_xml = '<name' + name_parts[0] + " abbreviation='" + name_abbr_str + "'" + name_parts[1]
         return tag.name(title)
 
     def format_for_html(self, raw_str):
@@ -33,9 +36,9 @@ class Casename:
         title = re.sub(r"[A-Z][A-Z\s+.]+", lambda entity: tag.em(entity.group().title()), name)
         return tag.h1(title)
 
-    def __init__(self, raw_str):
-        self.xml = self.format_for_xml(raw_str)
-        self.db_str = self.format_for_db(raw_str)
+    def __init__(self, raw_str, name_abbr_str):
+        self.xml = self.format_for_xml(raw_str, name_abbr_str)
+        self.db_name, self.db_name_abbreviation = self.format_for_db(raw_str, name_abbr_str)
         self.html = self.format_for_html(raw_str)
 
 class Footnote:

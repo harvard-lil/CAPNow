@@ -13,6 +13,8 @@ source_doc, source_pq = document, pq(document.element, parser='xml')
 template_path = 'sources/Case Template.docx'
 
 def get_elements():
+    name_abbreviation, citation, year = re.match(r'(.*), (\d+ Mass. \d+) \((\d{4})\)', in_path.rsplit('/', 1)[-1]).groups()
+
     pq(source_pq('w|p')[:4]).remove()
     paragraphs = source_pq('w|p')
     bookmarks = get_bookmarks(source_pq("w|highlight[w|val='yellow']"))
@@ -20,7 +22,7 @@ def get_elements():
     # casename
     par_num = 0
     casename_string = get_casename_string(paragraphs[par_num])
-    casename = Casename(casename_string)
+    casename = Casename(casename_string, name_abbreviation)
     parties = Parties(casename_string)
 
     # date
