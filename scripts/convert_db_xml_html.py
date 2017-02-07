@@ -1,3 +1,5 @@
+import re
+
 from scripts.convert import *
 from scripts.tags import tag
 from scripts.utils import *
@@ -45,7 +47,7 @@ def get_casename_string(par):
     for run in pq(par)('w|r'):
         if run.style and run.style == 'FootnoteReference':
             footnote = Footnote(run.xml)
-            full_str += footnote.format_xml()
+            full_str += footnote.format_for_xml()
         else:
             full_str += run.text
     return full_str

@@ -1,3 +1,6 @@
+import re
+from pyquery import PyQuery as pq
+
 def process_xml(par):
     text = ''
     for run in pq(par)('w|r'):

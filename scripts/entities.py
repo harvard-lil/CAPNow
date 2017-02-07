@@ -1,3 +1,7 @@
+import re
+from scripts.tags import tag
+from datetime import datetime
+
 class Parties:
     def format_for_xml(self, raw_str):
         raw_str = re.sub(r"([A-Z][A-Z\s+.]+)", lambda entity: tag.party(entity.group().title()), raw_str)
