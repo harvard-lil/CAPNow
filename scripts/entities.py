@@ -130,3 +130,14 @@ class Judges:
         self.xml = self.format_for_xml(raw_str)
         self.db_list = self.format_for_db(raw_str)
         self.html = self.format_for_html(raw_str)
+
+class Author:
+    def format_for_html(self, raw_str):
+        return tag.bold(raw_str)
+
+    def format_for_xml(self, raw_str):
+        return tag.author(raw_str)
+
+    def __init__(self, raw_str):
+        self.xml = self.format_for_xml(raw_str)
+        self.html = self.format_for_html(raw_str)

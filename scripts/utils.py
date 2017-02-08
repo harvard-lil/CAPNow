@@ -60,3 +60,8 @@ def get_new_casename_string(par):
         else:
             full_str += run.text
     return full_str
+
+def get_author(par):
+    for run in par:
+        if 'Author' in run.xml:
+            return run.text
