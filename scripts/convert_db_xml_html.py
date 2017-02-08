@@ -25,7 +25,7 @@ def get_elements():
 
     # casename
     par_num = 0
-    casename_string = get_casename_string(paragraphs[par_num])
+    casename_string = get_new_casename_string(paragraphs[par_num])
     casename = Casename(casename_string, name_abbreviation)
     parties = Parties(casename_string)
 
