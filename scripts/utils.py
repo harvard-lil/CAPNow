@@ -49,3 +49,14 @@ def process_footnotes(footnotes_pq):
 
 def has_text(el):
     return not re.match(r'^\s*$', pq(el).text())
+def get_new_casename_string(par):
+    full_str = ""
+    for run in pq(par)('w|r'):
+        if run.style and run.style == 'FootnoteReference':
+            footnote = Footnote(run.xml)
+            full_str += footnote.format_for_xml()
+        elif 'smallCaps' in run.xml:
+            full_str += run.text.upper()
+        else:
+            full_str += run.text
+    return full_str
