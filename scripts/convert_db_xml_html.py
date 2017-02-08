@@ -17,10 +17,9 @@ template_path = 'sources/Case Template.docx'
 def get_elements():
     name_abbreviation, citation, year = re.match(r'(.*), (\d+ Mass. \d+) \((\d{4})\)', in_path.rsplit('/', 1)[-1]).groups()
 
-    pq(source_pq('w|p')[:4]).remove()
     paragraphs = source_pq('w|p')
 
-    footnotes = process_footnotes(footnotes_pq)
+    footnotes = process_footnotes(footnotes_pq, source_pq)
     bookmarks = get_bookmarks(source_pq("w|highlight[w|val='yellow']"))
 
     # casename
@@ -46,56 +45,28 @@ def get_elements():
 
     # headnotes
     par_num = skip_blanks(paragraphs, par_num)
-    headnotes, par_num = get_headnotes(par_num)
+    # par_num = 4
 
-def get_casename_string(par):
-    full_str = ""
-    for run in pq(par)('w|r'):
-        if run.style and run.style == 'FootnoteReference':
-            footnote = Footnote(run.xml)
-            full_str += footnote.format_for_xml()
-        else:
-            full_str += run.text
-    return full_str
+    headnotes, par_num = get_paragraphs_with_style(paragraphs, 'Headnote')
+    par_num = skip_blanks(paragraphs, par_num)
 
-def get_bookmarks(bookmark_pq):
-    bookmarks = []
-    for i, highlight_run in enumerate(bookmark_pq):
-        highlight_run = pq(highlight_run).closest('w|r')
-        bookmark_name = "Headnote%s%s" % ("End" if i % 2 else "Start", int(i/2))
-        highlight_run.after(pq([
-            make_el(highlight_run[0], "w:bookmarkStart", {"w:id": str(i), "w:name": bookmark_name}),
-            make_el(highlight_run[0], "w:bookmarkEnd", {"w:id": str(i)})]))
-        remove_el(highlight_run[0])
-        bookmarks.append(bookmark_name)
-    return bookmarks
+    history, par_num = get_paragraphs_with_style(paragraphs, 'History')
+    par_num = skip_blanks(paragraphs, par_num)
 
-# headnotes: json.dumped list of paragraphs
-def get_headnotes(par_num):
-    headnotes = []
-    while has_text(paragraphs[par_num]):
-        # processed_headnote = process_xml(paragraphs[par_num])
-        # headnotes.append(processed_headnote)
-        headnotes.append(paragraphs[par_num])
-        # do_headnote_stuff(paragraphs[par_num])
-        par_num += 2
-    return headnotes, par_num
+    appearance, par_num = get_paragraphs_with_style(paragraphs, 'Appearance')
+    par_num = skip_blanks(paragraphs, par_num)
 
-def do_headnote_stuff(headnote):
-    # TODO: figure out what the hell deepcopy does, why is it necessary?
-    for run in pq(headnote).closest('w|p')('w|r'):
-        import ipdb; ipdb.set_trace()
-        run = pq(run)
-        parts = re.split(r'\[.*?\]', run('w|t').text())
-        if len(parts) > 1:
-            new_els = []
-            for i, part in enumerate(parts):
-                if i!= 0:
-                    new_els.extend(parse_xml_fragment(run[0], reference_template.format(bookmark_start=bookmarks.pop(0), bookmark_end=bookmarks.pop(0))))
-                new_run = deepcopy(run[0])
-                pq(new_run)('w|t').text(
-                    ("]" if i != 0 else "") + part + ("[" if i != len(parts) - 1 else "")
-                )
-                new_els.append(new_run)
-            run.after(pq(new_els))
-            remove_el(run[0])
+    author_string = get_author(paragraphs[par_num])
+    author = Author(author_string)
+
+
+
+def get_paragraphs_with_style(paragraphs, style):
+    pars = []
+    par_num = 0
+
+    for idx, p in enumerate(paragraphs):
+        if p.style == style:
+            pars.append(p)
+            par_num = idx
+    return p, par_num

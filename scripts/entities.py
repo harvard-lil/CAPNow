@@ -101,7 +101,7 @@ class Date:
 
     def __init__(self, raw_str):
         self.xml = self.format_for_xml(raw_str)
-        self.db_str = self.format_for_db(raw_str)
+        self.db_obj = self.format_for_db(raw_str)
         self.html = self.format_for_html(raw_str)
 
 class Categories:
@@ -117,7 +117,7 @@ class Categories:
 
 class Judges:
     def format_for_db(self, raw_str):
-        judges = re.sub(r'Present:|C.J.,|JJ.|&|\s{1}', '', raw_str).split(',')
+        judges = re.sub(r'Present:|C.J.,|JJ.|&|\s{1}', '', raw_str).split(',').pop()
         return judges
 
     def format_for_html(self, raw_str):

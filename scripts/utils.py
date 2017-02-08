@@ -1,6 +1,7 @@
 import re
 from pyquery import PyQuery as pq
-
+from scripts.entities import Footnote, FootnoteContent
+from scripts.tags import *
 def process_xml(par):
     text = ''
     for run in pq(par)('w|r'):
@@ -17,7 +18,7 @@ def strip_xml(xml_str):
     rx = re.compile('<\s*\w.*?>|</\s*\w.*?>|\n|\t|\r|\s{2}')
     return rx.sub('',xml_str)
 
-def process_footnotes(footnotes_pq):
+def process_footnotes(footnotes_pq, source_pq):
     footnotes = footnotes_pq('w|footnote').children()
     # remove blanks
     for query in (source_pq, footnotes_pq('w|footnote:not([w|type])')):
