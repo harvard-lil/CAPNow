@@ -1,7 +1,7 @@
 import re
 from pyquery import PyQuery as pq
 from scripts.entities import Footnote, FootnoteContent
-from scripts.tags import *
+
 def process_xml(par):
     text = ''
     for run in pq(par)('w|r'):

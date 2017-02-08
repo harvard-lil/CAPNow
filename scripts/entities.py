@@ -16,9 +16,6 @@ class Parties:
         self.html = self.format_for_html(raw_str)
 
 class Casename:
-    def get_footnote_num(self, footnote_str):
-        return re.search(r"\d+", footnote_str).group()
-
     def format_for_db(self, raw_str, name_abbreviation):
         name = re.sub(r"<footnotemark>\d+<\/footnotemark>", "", raw_str)
         return re.sub(r"[A-Z][A-Z]+", lambda entity: entity.group().title(), name), name_abbreviation
@@ -32,7 +29,7 @@ class Casename:
         return tag.name(title)
 
     def format_for_html(self, raw_str):
-        name = re.sub(r"<footnotemark>\d+<\/footnotemark>", lambda footnote: tag.sup(self.get_footnote_num(footnote.group())), raw_str)
+        name = re.sub(r"<footnotemark>\d+<\/footnotemark>", lambda footnote: tag.sup(Footnote.get_footnote_num(footnote.group())), raw_str)
         title = re.sub(r"[A-Z][A-Z\s+.]+", lambda entity: tag.em(entity.group().title()), name)
         return tag.h1(title)
 
@@ -43,6 +40,10 @@ class Casename:
 
 class Footnote:
     number = None
+
+    @classmethod
+    def get_footnote_num(self, footnote_str):
+        return re.search(r"\d+", footnote_str).group()
 
     def format_for_xml(self):
         return "<footnotemark>%s</footnotemark>" % self.number
@@ -117,7 +118,8 @@ class Categories:
 
 class Judges:
     def format_for_db(self, raw_str):
-        judges = re.sub(r'Present:|C.J.,|JJ.|&|\s{1}', '', raw_str).split(',').pop()
+        judges = re.sub(r'Present:|C.J.,|JJ.|&|\s{1}', '', raw_str).split(',')
+        judges.pop()
         return judges
 
     def format_for_html(self, raw_str):
@@ -139,6 +141,7 @@ class Author:
         return tag.author(raw_str)
 
     def __init__(self, raw_str):
+        raw_str = re.sub(r'\t', '', raw_str)
         self.xml = self.format_for_xml(raw_str)
         self.html = self.format_for_html(raw_str)
 
