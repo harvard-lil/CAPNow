@@ -50,6 +50,32 @@ def process_footnotes(footnotes_pq, source_pq):
 
 def has_text(el):
     return not re.match(r'^\s*$', pq(el).text())
+def get_casename_string(par):
+    full_str = ""
+    for run in pq(par)('w|r'):
+        if run.style and run.style == 'FootnoteReference':
+            footnote = Footnote(run.xml)
+            full_str += footnote.format_for_xml()
+        else:
+            full_str += run.text
+    return full_str
+
+def get_casetext(par_num, paragraphs):
+    casetext = []
+    for par in paragraphs[par_num:]:
+        full_str = ''
+        for run in par:
+            try:
+                if run.style and run.style == 'FootnoteReference':
+                    footnote = Footnote(run.xml)
+                    full_str += footnote.format_for_xml()
+            except:
+                pass
+            if run.text:
+                full_str += re.sub(r'\t', '', run.text)
+        casetext.append(full_str)
+    return casetext
+
 def get_new_casename_string(par):
     full_str = ""
     for run in pq(par)('w|r'):
