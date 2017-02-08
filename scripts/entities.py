@@ -141,3 +141,41 @@ class Author:
     def __init__(self, raw_str):
         self.xml = self.format_for_xml(raw_str)
         self.html = self.format_for_html(raw_str)
+
+class Appearance:
+    def format_for_xml(self, alist):
+        new_alist = []
+        for p in alist:
+            new_alist.append(tag.attorneys(p))
+        return new_alist
+
+    def format_for_html(self, plist):
+        new_plist = []
+        for p in plist:
+            if 'footnotemark' in p:
+                p = re.sub(r"<footnotemark>\d+<\/footnotemark>", lambda footnote: tag.sup(Footnote.get_footnote_num(footnote.group())), p)
+            new_plist.append(tag.p(p))
+        return new_plist
+
+    def __init__(self, plist):
+        self.html = self.format_for_html(plist)
+        self.xml = self.format_for_xml(plist)
+
+class CaseText:
+    def format_for_html(self, plist):
+        new_plist = []
+        for p in plist:
+            if 'footnotemark' in p:
+                p = re.sub(r"<footnotemark>\d+<\/footnotemark>", lambda footnote: tag.sup(Footnote.get_footnote_num(footnote.group())), p)
+            new_plist.append(tag.p(p))
+        return new_plist
+
+    def format_for_xml(self, plist):
+        new_plist = []
+        for p in plist:
+            new_plist.append(tag.p(p))
+        return new_plist
+
+    def __init__(self, plist):
+        self.html = self.format_for_html(plist)
+        self.xml = self.format_for_xml(plist)

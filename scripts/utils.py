@@ -66,3 +66,12 @@ def get_author(par):
     for run in par:
         if 'Author' in run.xml:
             return run.text
+def get_paragraphs_with_style(paragraphs, style):
+    pars = []
+    par_num = 0
+
+    for idx, p in enumerate(paragraphs):
+        if p.style == style:
+            pars.append(p)
+            par_num = idx
+    return pars, par_num

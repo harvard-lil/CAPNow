@@ -46,27 +46,21 @@ def get_elements():
     # headnotes
     par_num = skip_blanks(paragraphs, par_num)
     # par_num = 4
-
     headnotes, par_num = get_paragraphs_with_style(paragraphs, 'Headnote')
-    par_num = skip_blanks(paragraphs, par_num)
 
-    history, par_num = get_paragraphs_with_style(paragraphs, 'History')
     par_num = skip_blanks(paragraphs, par_num)
+    history_list, par_num = get_paragraphs_with_style(paragraphs, 'History')
+    history_list = get_casetext(0, history_list)
+    history = CaseText(history_list)
 
-    appearance, par_num = get_paragraphs_with_style(paragraphs, 'Appearance')
     par_num = skip_blanks(paragraphs, par_num)
+    appearance_list, par_num = get_paragraphs_with_style(paragraphs, 'Appearance')
+    appearance_list = get_casetext(0, appearance_list)
+    appearance = Appearance(appearance_list)
 
+    par_num = skip_blanks(paragraphs, par_num)
     author_string = get_author(paragraphs[par_num])
     author = Author(author_string)
 
-
-
-def get_paragraphs_with_style(paragraphs, style):
-    pars = []
-    par_num = 0
-
-    for idx, p in enumerate(paragraphs):
-        if p.style == style:
-            pars.append(p)
-            par_num = idx
-    return p, par_num
+    casetext_list = get_casetext(par_num, paragraphs)
+    casetext = CaseText(casetext_list)
