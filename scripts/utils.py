@@ -89,9 +89,14 @@ def get_new_casename_string(par):
     return full_str
 
 def get_author(par):
+    author = ''
     for run in par:
-        if 'Author' in run.xml:
-            return run.text
+        try:
+            if 'Author' in run.xml:
+                author += run.text
+        except:
+            pass
+    return re.sub(r'\t', '', author)
 def get_paragraphs_with_style(paragraphs, style):
     pars = []
     par_num = 0
