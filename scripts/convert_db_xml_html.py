@@ -12,15 +12,11 @@ document = Document(source_path)
 source_doc, source_pq = document, pq(document.element, parser='xml')
 footnotes_part, footnotes_el, footnotes_pq = load_part(source_doc.part.part_related_by(RT.FOOTNOTES))
 
-template_path = 'sources/Case Template.docx'
-
 def get_elements():
     name_abbreviation, citation, year = re.match(r'(.*), (\d+ Mass. \d+) \((\d{4})\)', in_path.rsplit('/', 1)[-1]).groups()
 
     paragraphs = source_pq('w|p')
-
     footnotes = process_footnotes(footnotes_pq, source_pq)
-    bookmarks = get_bookmarks(source_pq("w|highlight[w|val='yellow']"))
 
     # casename
     par_num = 0
@@ -45,7 +41,6 @@ def get_elements():
 
     # headnotes
     par_num = skip_blanks(paragraphs, par_num)
-    # par_num = 4
     headnotes, par_num = get_paragraphs_with_style(paragraphs, 'Headnote')
 
     par_num = skip_blanks(paragraphs, par_num)
