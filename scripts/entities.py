@@ -182,3 +182,29 @@ class CaseText:
     def __init__(self, plist):
         self.html = self.format_for_html(plist)
         self.xml = self.format_for_xml(plist)
+
+class Headnotes:
+    def format_for_xml(self, hlist):
+        new_hlist = []
+        for h in hlist:
+            new_hlist.append(tag.p(process_xml(h)))
+        return new_hlist
+
+    def format_for_html(self, hlist):
+        new_hlist = []
+        for h in hlist:
+            new_hlist.append(tag.p(process_xml(h)))
+        return new_hlist
+
+    def __init__(self, plist):
+        self.xml = self.format_for_xml(plist)
+        self.html = self.format_for_html(plist)
+
+class Court:
+    def set_lower_court(self, date_string):
+        self.lower_court = re.match(r'\w+', date_string).group()
+        self.xml.append(tag.court(self.lower_court))
+        
+    def __init__(self):
+        self.xml = []
+        pass

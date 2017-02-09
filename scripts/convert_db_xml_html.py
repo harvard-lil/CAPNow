@@ -13,10 +13,12 @@ source_doc, source_pq = document, pq(document.element, parser='xml')
 footnotes_part, footnotes_el, footnotes_pq = load_part(source_doc.part.part_related_by(RT.FOOTNOTES))
 
 def get_elements():
-    name_abbreviation, citation, year = re.match(r'(.*), (\d+ Mass. \d+) \((\d{4})\)', in_path.rsplit('/', 1)[-1]).groups()
+    docname = source_path.rsplit('/', 1)[-1]
+    name_abbreviation, citation, year = get_docname_parts(docname)
 
     paragraphs = source_pq('w|p')
     footnotes = process_footnotes(footnotes_pq, source_pq)
+    court = Court()
 
     # casename
     par_num = 0
@@ -28,6 +30,7 @@ def get_elements():
     par_num = skip_blanks(paragraphs, par_num)
     date_string = process_xml(paragraphs[par_num])
     date = Date(date_string)
+    court.set_lower_court(date_string)
 
     # judges
     par_num = skip_blanks(paragraphs, par_num)
@@ -41,7 +44,8 @@ def get_elements():
 
     # headnotes
     par_num = skip_blanks(paragraphs, par_num)
-    headnotes, par_num = get_paragraphs_with_style(paragraphs, 'Headnote')
+    headnotes_list, par_num = get_paragraphs_with_style(paragraphs, 'Headnote')
+    headnotes = Headnotes(headnotes_list)
 
     par_num = skip_blanks(paragraphs, par_num)
     history_list, par_num = get_paragraphs_with_style(paragraphs, 'History')
@@ -57,5 +61,6 @@ def get_elements():
     author_string = get_author(paragraphs[par_num])
     author = Author(author_string)
 
+    par_num = skip_blanks(paragraphs, par_num)
     casetext_list = get_casetext(par_num, paragraphs)
     casetext = CaseText(casetext_list)

@@ -97,6 +97,7 @@ def get_author(par):
         except:
             pass
     return re.sub(r'\t', '', author)
+
 def get_paragraphs_with_style(paragraphs, style):
     pars = []
     par_num = 0
@@ -106,3 +107,10 @@ def get_paragraphs_with_style(paragraphs, style):
             pars.append(p)
             par_num = idx
     return pars, par_num
+
+def get_docname_parts(docname):
+    citation_plus = re.search(r'\d+_\w+._\d+', docname).group()
+    citation = re.sub(r'_', ' ', citation_plus)
+    year = int(re.search(r'\d{4}\.proof\.docx$', docname).group().split('.proof.docx')[0])
+    name_abbreviation = re.sub(r'_', ' ', docname.split(citation_plus)[0]).rstrip()
+    return name_abbreviation, citation, year
