@@ -56,6 +56,10 @@ def process_footnotes(footnotes_pq, source_pq):
 
 def has_text(el):
     return not re.match(r'^\s*$', pq(el).text())
+
+def clean_xml(xml):
+    return re.sub(r"\s\&\s", " &amp; ", xml)
+
 def get_casename_string(par):
     full_str = ""
     for run in pq(par)('w|r'):

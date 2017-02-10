@@ -9,17 +9,21 @@ def process_xml(par):
         text += run.text
     return text
 
+def clean_xml(xml):
+    return re.sub(r"\s\&\s", " &amp; ", xml)
+
 class Parties:
     def format_for_xml(self, raw_str):
-        raw_str = re.sub(r"([A-Z][A-Z\s+.]+)", lambda entity: tag.party(entity.group().title()), raw_str)
+        raw_str = re.sub(r"([A-Z][A-Z\s+.]+)", lambda entity: tag.party(entity.group().title().rstrip()), raw_str)
         return tag.parties(raw_str)
 
     def format_for_html(self, raw_str):
-        raw_str = re.sub(r"([A-Z][A-Z\s+.]+)", lambda entity: tag.em(entity.group().title()), raw_str)
+        raw_str = re.sub(r"([A-Z][A-Z\s+.]+)", lambda entity: tag.em(entity.group().title().rstrip()), raw_str)
         return tag.h1(raw_str)
 
     def __init__(self, raw_str):
-        self.xml = self.format_for_xml(raw_str)
+        clean_xml_str = clean_xml(raw_str)
+        self.xml = self.format_for_xml(clean_xml_str)
         self.html = self.format_for_html(raw_str)
 
 class Casename:
@@ -41,7 +45,9 @@ class Casename:
         return tag.h1(title)
 
     def __init__(self, raw_str, name_abbr_str):
-        self.xml = self.format_for_xml(raw_str, name_abbr_str)
+        clean_xml_str = clean_xml(raw_str)
+        clean_xml_abbr = clean_xml(name_abbr_str)
+        self.xml = self.format_for_xml(clean_xml_str, clean_xml_abbr)
         self.db_name, self.db_name_abbreviation = self.format_for_db(raw_str, name_abbr_str)
         self.html = self.format_for_html(raw_str)
 
@@ -71,17 +77,19 @@ class FootnoteContent:
 
     def __init__(self, raw_str, num):
         self.number = num
-        self.xml = self.format_for_xml(raw_str)
+        clean_xml_str = clean_xml(raw_str)
+        self.xml = self.format_for_xml(clean_xml_str)
 
 class Footnotes:
     def format_for_xml(self, raw_list):
         footnotes = ""
         for footnote in footnotes:
-            footnote += footnote.xml
+            footnote += clean_xml(footnote.xml)
         return footnotes
 
     def __init__(self, raw_list):
         self.xml = self.format_for_xml(raw_list)
+
 class Date:
     def get_enddate_str(self, raw_str):
         return raw_str.split(' - ')[1]
@@ -129,7 +137,8 @@ class Categories:
         return tag.categories(raw_str)
 
     def __init__(self, raw_str):
-        self.xml = self.format_for_xml(raw_str)
+        clean_xml_str = clean_xml(raw_str)
+        self.xml = self.format_for_xml(clean_xml_str)
         self.html = self.format_for_html(raw_str)
 
 class Judges:
@@ -145,7 +154,8 @@ class Judges:
         return tag.judges(raw_str)
 
     def __init__(self, raw_str):
-        self.xml = self.format_for_xml(raw_str)
+        clean_xml_str = clean_xml(raw_str)
+        self.xml = self.format_for_xml(clean_xml_str)
         self.db_list = self.format_for_db(raw_str)
         self.html = self.format_for_html(raw_str)
 
@@ -158,14 +168,15 @@ class Author:
 
     def __init__(self, raw_str):
         raw_str = re.sub(r'\t', '', raw_str)
-        self.xml = self.format_for_xml(raw_str)
+        clean_xml_str = clean_xml(raw_str)
+        self.xml = self.format_for_xml(clean_xml_str)
         self.html = self.format_for_html(raw_str)
 
 class Appearance:
     def format_for_xml(self, alist):
         appearance_string = ""
         for p in alist:
-            appearance_string += tag.attorneys(p) + "\n"
+            appearance_string += clean_xml(tag.attorneys(p) + "\n")
         return appearance_string
 
     def format_for_html(self, plist):
@@ -173,7 +184,7 @@ class Appearance:
         for p in plist:
             if 'footnotemark' in p:
                 p = re.sub(r"<footnotemark>\d+<\/footnotemark>", lambda footnote: tag.sup(Footnote.get_footnote_num(footnote.group())), p)
-            appearance_string += tag.p(p) + "\n"
+            appearance_string += clean_xml(tag.p(p) + "\n")
         return appearance_string
 
     def __init__(self, plist):
@@ -186,13 +197,13 @@ class CaseText:
         for p in plist:
             if 'footnotemark' in p:
                 p = re.sub(r"<footnotemark>\d+<\/footnotemark>", lambda footnote: tag.sup(Footnote.get_footnote_num(footnote.group())), p)
-            casetext_string += tag.p(p) + "\n"
+            casetext_string += clean_xml(tag.p(p) + "\n")
         return casetext_string
 
     def format_for_xml(self, plist):
         casetext_string = ""
         for p in plist:
-            casetext_string += tag.p(p) + "\n"
+            casetext_string += clean_xml(tag.p(p) + "\n")
         return casetext_string
 
     def __init__(self, plist):
@@ -203,7 +214,7 @@ class Headnotes:
     def format_for_xml(self, hlist):
         headnotes_string = ""
         for h in hlist:
-            headnotes_string += tag.p(process_xml(h)) + "\n"
+            headnotes_string += clean_xml(tag.p(process_xml(h)) + "\n")
         return headnotes_string
 
     def __init__(self, plist):
@@ -224,4 +235,5 @@ class Citation:
         return tag.citation(raw_str)
 
     def __init__(self, raw_str):
-        self.xml = self.format_for_xml(raw_str)
+        clean_xml_str = clean_xml(raw_str)
+        self.xml = self.format_for_xml(clean_xml_str)
