@@ -156,3 +156,7 @@ class Case(DeletableModel):
         reader = PyPDF2.PdfFileReader(proof.pdf.file)
         self.last_page = self.first_page + reader.getNumPages() - 1
         self.save()
+
+    def update_values(self, data):
+        self.update(**kwargs)
+        self.save()
