@@ -13,17 +13,17 @@ def clean_xml(xml):
     return re.sub(r"\s\&\s", " &amp; ", xml)
 
 class Parties:
+    def _format(self, tagger, raw_str):
+        return re.sub(r"([A-Z][A-Z\s+.]+)", lambda entity: tagger(entity.group().title().rstrip()), raw_str)
+
     def format_for_xml(self, raw_str):
-        raw_str = re.sub(r"([A-Z][A-Z\s+.]+)", lambda entity: tag.party(entity.group().title().rstrip()), raw_str)
-        return tag.parties(raw_str)
+        return tag.parties(self._format(tag.party, raw_str))
 
     def format_for_html(self, raw_str):
-        raw_str = re.sub(r"([A-Z][A-Z\s+.]+)", lambda entity: tag.em(entity.group().title().rstrip()), raw_str)
-        return tag.h1(raw_str)
+        return tag.h1(self._format(tag.em, raw_str))
 
     def __init__(self, raw_str):
-        clean_xml_str = clean_xml(raw_str)
-        self.xml = self.format_for_xml(clean_xml_str)
+        self.xml = self.format_for_xml(clean_xml(raw_str))
         self.html = self.format_for_html(raw_str)
 
 class Casename:
