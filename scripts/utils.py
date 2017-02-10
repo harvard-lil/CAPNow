@@ -129,6 +129,9 @@ def write_file(filename, case, data, filetype='xml'):
     content = ""
     if filetype == 'xml':
         content = xml_template.substitute(
+            case_id=case.id,
+            first_page=case.first_page,
+            last_page=case.last_page,
             casename=data['casename'].xml,
             citation=data['citation'].xml,
             decisiondate=data['date'].xml[0],
@@ -139,9 +142,9 @@ def write_file(filename, case, data, filetype='xml'):
             judges=data['judges'].xml,
             author=data['author'].xml,
             casetext=data['casetext'].xml,
-            categories=data['categories'].html,
+            categories=data['categories'].xml,
             headnotes=data['headnotes'].html,
-            footnotes=data['footnotes'],
+            footnotes=data['footnotes'].xml,
             )
     elif filetype == 'html':
         content = html_template.substitute(
@@ -163,7 +166,7 @@ xml_template = string.Template("""<?xml version='1.0' encoding='utf-8'?>
   <dmdSec ID="case">
     <mdWrap MDTYPE="OTHER" OTHERMDTYPE="HLS-CASELAW-CASEXML">
       <xmlData>
-        <case xmlns="http://nrs.harvard.edu/urn-3:HLS.Libr.US_Case_Law.Schema.Case:v1" case_id="{case.id}">
+        <case xmlns="http://nrs.harvard.edu/urn-3:HLS.Libr.US_Case_Law.Schema.Case:v1" case_id="$case_id">
             $casename
             $citation
             $decisiondate
@@ -176,7 +179,7 @@ xml_template = string.Template("""<?xml version='1.0' encoding='utf-8'?>
         <file ID="casebody_id" MIMETYPE="text/xml">
           <FContent>
             <xmlData>
-              <casebody xmlns="http://nrs.harvard.edu/urn-3:HLS.Libr.US_Case_Law.Schema.Case_Body:v1" firstpage="{case.first_page}" lastpage="{case.last_page}">
+              <casebody xmlns="http://nrs.harvard.edu/urn-3:HLS.Libr.US_Case_Law.Schema.Case_Body:v1" firstpage="$first_page" lastpage="$last_page">
                 $parties
                 $decisiondate_two
                 $decisiondate_other
