@@ -13,6 +13,7 @@ from docx.shared import Inches, Pt
 from pyquery import PyQuery as pq
 from copy import deepcopy
 
+from scripts.utils import *
 # # monkeypatch in missing namespace
 # nsmap['vt'] = "http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"
 
@@ -80,9 +81,6 @@ def make_el(example_el, tag_name, attrs=None):
         for k, v in attrs.items():
             new_el.attrib[qn(k)] = v
     return new_el
-
-def remove_el(el):
-    el.getparent().remove(el)
 
 def parse_xml_fragment(example_el, xml):
     """ Parse xml using example_el for namespace information. """

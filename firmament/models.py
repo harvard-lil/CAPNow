@@ -51,6 +51,9 @@ class Proof(models.Model):
                                     choices=(('pending', 'pending'), ('generated', 'generated'), ('failed', 'failed')),
                                     blank=True, null=True)
 
+    xml = models.FileField(blank=True, null=True)
+    html = models.FileField(blank=True, null=True)
+
     class Meta:
         ordering = ('-timestamp',)
 
@@ -126,7 +129,6 @@ class Judge(models.Model):
 class Case(DeletableModel):
     volume = models.ForeignKey(Volume, related_name='cases')
     court = models.ForeignKey(Court, related_name='cases', blank=True, null=True)
-    headnotes = models.TextField(null=True)
     name = models.CharField(max_length=1024, null=True)
     name_abbreviation = models.CharField(max_length=256, null=True)
     year = models.IntegerField()

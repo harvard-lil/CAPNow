@@ -1,6 +1,13 @@
 import re
 from scripts.tags import tag
+from pyquery import PyQuery as pq
 from datetime import datetime
+
+def process_xml(par):
+    text = ''
+    for run in pq(par)('w|r'):
+        text += run.text
+    return text
 
 class Parties:
     def format_for_xml(self, raw_str):
@@ -147,18 +154,18 @@ class Author:
 
 class Appearance:
     def format_for_xml(self, alist):
-        new_alist = []
+        appearance_string = ""
         for p in alist:
-            new_alist.append(tag.attorneys(p))
-        return new_alist
+            appearance_string += tag.attorneys(p) + "\n"
+        return appearance_string
 
     def format_for_html(self, plist):
-        new_plist = []
+        appearance_string = ""
         for p in plist:
             if 'footnotemark' in p:
                 p = re.sub(r"<footnotemark>\d+<\/footnotemark>", lambda footnote: tag.sup(Footnote.get_footnote_num(footnote.group())), p)
-            new_plist.append(tag.p(p))
-        return new_plist
+            appearance_string += tag.p(p) + "\n"
+        return appearance_string
 
     def __init__(self, plist):
         self.html = self.format_for_html(plist)
@@ -166,18 +173,18 @@ class Appearance:
 
 class CaseText:
     def format_for_html(self, plist):
-        new_plist = []
+        casetext_string = ""
         for p in plist:
             if 'footnotemark' in p:
                 p = re.sub(r"<footnotemark>\d+<\/footnotemark>", lambda footnote: tag.sup(Footnote.get_footnote_num(footnote.group())), p)
-            new_plist.append(tag.p(p))
-        return new_plist
+            casetext_string += tag.p(p) + "\n"
+        return casetext_string
 
     def format_for_xml(self, plist):
-        new_plist = []
+        casetext_string = ""
         for p in plist:
-            new_plist.append(tag.p(p))
-        return new_plist
+            casetext_string += tag.p(p) + "\n"
+        return casetext_string
 
     def __init__(self, plist):
         self.html = self.format_for_html(plist)
@@ -185,26 +192,27 @@ class CaseText:
 
 class Headnotes:
     def format_for_xml(self, hlist):
-        new_hlist = []
+        headnotes_string = ""
         for h in hlist:
-            new_hlist.append(tag.p(process_xml(h)))
-        return new_hlist
-
-    def format_for_html(self, hlist):
-        new_hlist = []
-        for h in hlist:
-            new_hlist.append(tag.p(process_xml(h)))
-        return new_hlist
+            headnotes_string += tag.p(process_xml(h)) + "\n"
+        return headnotes_string
 
     def __init__(self, plist):
         self.xml = self.format_for_xml(plist)
-        self.html = self.format_for_html(plist)
+        self.html = self.format_for_xml(plist)
 
 class Court:
     def set_lower_court(self, date_string):
         self.lower_court = re.match(r'\w+', date_string).group()
         self.xml.append(tag.court(self.lower_court))
-        
+
     def __init__(self):
         self.xml = []
         pass
+
+class Citation:
+    def format_for_xml(self, raw_str):
+        return tag.citation(raw_str)
+
+    def __init__(self, raw_str):
+        self.xml = self.format_for_xml(raw_str)

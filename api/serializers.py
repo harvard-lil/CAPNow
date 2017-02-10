@@ -5,7 +5,8 @@ from rest_framework import serializers
 
 from firmament.models import Volume, Case, Proof, Series
 from scripts.convert import convert
-
+from scripts.convert_db_xml_html import parse_elements
+from scripts.utils import write_file
 
 class ProofSerializer(serializers.ModelSerializer):
     class Meta:
@@ -63,13 +64,39 @@ class CaseSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data['volume'].save()
         proof_docx = validated_data.pop('proof_docx')
+
         instance = super(CaseSerializer, self).create(validated_data)
-        proof = Proof()
-        proof.docx.save(
-            validated_data['manuscript'].name.replace('.docx', '.proof.docx'),
-            proof_docx)
-        proof.save()
-        instance.proofs = [proof]
+
+        # write docx
+        d_proof = Proof()
+        proof_name = validated_data['manuscript'].name.replace('.docx', '.proof.docx')
+        d_proof.docx.save(proof_name, proof_docx)
+        d_proof.save()
+        data = parse_elements(case=instance, proof=d_proof, source_path=proof_name, convert_to_xml=True, convert_to_html=True)
+
+        instance.name_abbreviation = data['casename'].db_name_abbreviation
+        instance.name = data['casename'].db_name
+        instance.decision_date = data['date'].db_obj
+
+        # write xml
+        proof_name = proof_name.replace('.docx', '.xml')
+        proof_xml = write_file(proof_name, instance, data, filetype='xml')
+        x_proof = Proof()
+        x_proof.xml.save(proof_name, proof_xml)
+        x_proof.save()
+
+        # write html
+        proof_name = proof_name.replace('.xml', '.html')
+        proof_html = write_file(proof_name, instance, data, filetype='html')
+        h_proof = Proof()
+        h_proof.html.save(proof_name, proof_html)
+        h_proof.save()
+
+        instance.proofs = [d_proof, x_proof, h_proof]
+
+        instance.save()
+
+
         return instance
 
 

@@ -11,56 +11,64 @@ source_path = "/Users/aaizman/Documents/firmament/docs/originals/Bayless v. TTS 
 document = Document(source_path)
 source_doc, source_pq = document, pq(document.element, parser='xml')
 footnotes_part, footnotes_el, footnotes_pq = load_part(source_doc.part.part_related_by(RT.FOOTNOTES))
+def parse_elements(case, proof, source_path='', convert_to_xml=True, convert_to_html=True):
+    document = Document(proof.docx)
+    source_doc, source_pq = document, pq(document.element, parser='xml')
+    footnotes_part, footnotes_el, footnotes_pq = load_part(source_doc.part.part_related_by(RT.FOOTNOTES))
 
-def get_elements():
     docname = source_path.rsplit('/', 1)[-1]
-    name_abbreviation, citation, year = get_docname_parts(docname)
+    data = dict()
+    name_abbreviation, citation, data['year'] = get_docname_parts(docname)
+
+    data['citation'] = Citation(citation)
 
     paragraphs = source_pq('w|p')
-    footnotes = process_footnotes(footnotes_pq, source_pq)
+    data['footnotes'] = process_footnotes(footnotes_pq, source_pq)
     court = Court()
 
     # casename
     par_num = 0
     casename_string = get_new_casename_string(paragraphs[par_num])
-    casename = Casename(casename_string, name_abbreviation)
-    parties = Parties(casename_string)
+    data['casename'] = Casename(casename_string, name_abbreviation)
+    data['parties'] = Parties(casename_string)
 
     # date
     par_num = skip_blanks(paragraphs, par_num)
     date_string = process_xml(paragraphs[par_num])
-    date = Date(date_string)
+    data['date'] = Date(date_string)
     court.set_lower_court(date_string)
 
     # judges
     par_num = skip_blanks(paragraphs, par_num)
     judges_string = process_xml(paragraphs[par_num])
-    judges = Judges(judges_string)
+    data['judges'] = Judges(judges_string)
 
     # categories
     par_num = skip_blanks(paragraphs, par_num)
     categories_string = process_xml(paragraphs[par_num])
-    categories = Categories(categories_string)
+    data['categories'] = Categories(categories_string)
 
     # headnotes
     par_num = skip_blanks(paragraphs, par_num)
     headnotes_list, par_num = get_paragraphs_with_style(paragraphs, 'Headnote')
-    headnotes = Headnotes(headnotes_list)
+    data['headnotes'] = Headnotes(headnotes_list)
 
     par_num = skip_blanks(paragraphs, par_num)
     history_list, par_num = get_paragraphs_with_style(paragraphs, 'History')
     history_list = get_casetext(0, history_list)
-    history = CaseText(history_list)
+    data['history'] = CaseText(history_list)
 
     par_num = skip_blanks(paragraphs, par_num)
     appearance_list, par_num = get_paragraphs_with_style(paragraphs, 'Appearance')
     appearance_list = get_casetext(0, appearance_list)
-    appearance = Appearance(appearance_list)
+    data['appearance'] = Appearance(appearance_list)
 
     par_num = skip_blanks(paragraphs, par_num)
     author_string = get_author(paragraphs[par_num])
-    author = Author(author_string)
+    data['author'] = Author(author_string)
 
     par_num = skip_blanks(paragraphs, par_num)
     casetext_list = get_casetext(par_num, paragraphs)
-    casetext = CaseText(casetext_list)
+    data['casetext'] = CaseText(casetext_list)
+
+    return data
