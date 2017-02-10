@@ -69,7 +69,7 @@ class FootnoteContent:
     number = None
 
     def format_for_xml(self, raw_str):
-        return "<footnote label=" + str(self.number) + ">" + tag.p(raw_str)  + "</footnote>"
+        return "<footnote label=\"" + str(self.number) + "\">" + tag.p(raw_str)  + "</footnote>"
 
     def add_to_xml(self, raw_str):
         footnote_parts = self.xml.split("</p></footnote>")
@@ -83,8 +83,8 @@ class FootnoteContent:
 class Footnotes:
     def format_for_xml(self, raw_list):
         footnotes = ""
-        for footnote in footnotes:
-            footnote += clean_xml(footnote.xml)
+        for footnote in raw_list:
+            footnotes += clean_xml(footnote.xml + "\n")
         return footnotes
 
     def __init__(self, raw_list):
