@@ -35,7 +35,7 @@ class CaseFeed(Feed):
         return extra
     
     def items(self):
-        return Case.objects.order_by('-year')[:5]
+        return Case.objects.order_by('-year')[:500] 
 
     def item_title(self, item):
         return item.short_name
