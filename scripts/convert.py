@@ -415,6 +415,6 @@ if __name__ == '__main__':
         out_path = os.path.join(out_path, os.path.basename(in_path))
 
     # get case info from source path
-    short_name, cite, year = re.match(r'(.*), (\d+ Mass. \d+) \((\d{4})\)', in_path.rsplit('/', 1)[-1]).groups()
+    name_abbreviation, cite, year = re.match(r'(.*), (\d+ Mass. \d+) \((\d{4})\)', in_path.rsplit('/', 1)[-1]).groups()
 
     convert(in_path, out_path, short_name, cite, year)
