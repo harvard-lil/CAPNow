@@ -73,6 +73,15 @@ class FootnoteContent:
         self.number = num
         self.xml = self.format_for_xml(raw_str)
 
+class Footnotes:
+    def format_for_xml(self, raw_list):
+        footnotes = ""
+        for footnote in footnotes:
+            footnote += footnote.xml
+        return footnotes
+
+    def __init__(self, raw_list):
+        self.xml = self.format_for_xml(raw_list)
 class Date:
     def get_enddate_str(self, raw_str):
         return raw_str.split(' - ')[1]
