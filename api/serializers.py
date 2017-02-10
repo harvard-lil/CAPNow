@@ -11,12 +11,14 @@ from scripts.utils import write_file
 class ProofSerializer(serializers.ModelSerializer):
     class Meta:
         model = Proof
-        fields = ('timestamp', 'docx', 'pdf', 'pdf_status')
+        fields = ('timestamp', 'docx', 'pdf', 'pdf_status', 'xml', 'html')
         extra_kwargs = {
             "docx": {"required": False,},
             "timestamp": {"read_only": True},
             "pdf": {"read_only": True},
             "pdf_status": {"read_only": True},
+            "xml": {"read_only": True},
+            "html": {"read_only": True},
         }
 
 class CaseSerializer(serializers.ModelSerializer):
@@ -68,11 +70,11 @@ class CaseSerializer(serializers.ModelSerializer):
         instance = super(CaseSerializer, self).create(validated_data)
 
         # write docx
-        d_proof = Proof()
+        proof = Proof()
         proof_name = validated_data['manuscript'].name.replace('.docx', '.proof.docx')
-        d_proof.docx.save(proof_name, proof_docx)
-        d_proof.save()
-        data = parse_elements(case=instance, proof=d_proof, source_path=proof_name, convert_to_xml=True, convert_to_html=True)
+        proof.docx.save(proof_name, proof_docx)
+
+        data = parse_elements(case=instance, proof=proof, source_path=proof_name, convert_to_xml=True, convert_to_html=True)
 
         instance.name_abbreviation = data['casename'].db_name_abbreviation
         instance.name = data['casename'].db_name
@@ -81,18 +83,15 @@ class CaseSerializer(serializers.ModelSerializer):
         # write xml
         proof_name = proof_name.replace('.docx', '.xml')
         proof_xml = write_file(proof_name, instance, data, filetype='xml')
-        x_proof = Proof()
-        x_proof.xml.save(proof_name, proof_xml)
-        x_proof.save()
+        proof.xml.save(proof_name, proof_xml)
 
         # write html
         proof_name = proof_name.replace('.xml', '.html')
         proof_html = write_file(proof_name, instance, data, filetype='html')
-        h_proof = Proof()
-        h_proof.html.save(proof_name, proof_html)
-        h_proof.save()
+        proof.html.save(proof_name, proof_html)
+        proof.save()
 
-        instance.proofs = [d_proof, x_proof, h_proof]
+        instance.proofs = [proof]
 
         instance.save()
 

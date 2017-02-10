@@ -23,7 +23,8 @@ def parse_elements(case, proof, source_path='', convert_to_xml=True, convert_to_
     data['citation'] = Citation(citation)
 
     paragraphs = source_pq('w|p')
-    data['footnotes'] = process_footnotes(footnotes_pq, source_pq)
+    footnotes = process_footnotes(footnotes_pq, source_pq)
+    data['footnotes'] = Footnotes(footnotes)
     court = Court()
 
     # casename
