@@ -176,8 +176,11 @@ xml_template = string.Template("""<?xml version='1.0' encoding='utf-8'?>
                 $parties
                 $decisiondate_two
                 $decisiondate_other
-                $attorneys
                 $judges
+                $categories
+                $headnotes
+                $attorneys
+                $casetext
                 $footnotes
               </casebody>
             </xmlData>
@@ -190,9 +193,9 @@ xml_template = string.Template("""<?xml version='1.0' encoding='utf-8'?>
 
 html_template = string.Template("""$casename
 $decisiondate
-$parties
 $attorneys
 $judges
 $categories
 $headnotes
+$casetext
 """)
