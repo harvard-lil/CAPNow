@@ -7,11 +7,7 @@ from scripts.entities import *
 from firmament.models import Case
 from datetime import datetime
 
-source_path = "/Users/aaizman/Documents/firmament/docs/originals/Bayless v. TTS Trio Corporation, 474 Mass. 1 (2016).docx"
-document = Document(source_path)
-source_doc, source_pq = document, pq(document.element, parser='xml')
-footnotes_part, footnotes_el, footnotes_pq = load_part(source_doc.part.part_related_by(RT.FOOTNOTES))
-def parse_elements(case, proof, source_path='', convert_to_xml=True, convert_to_html=True):
+def parse_elements(case, proof, source_path):
     document = Document(proof.docx)
     source_doc, source_pq = document, pq(document.element, parser='xml')
     footnotes_part, footnotes_el, footnotes_pq = load_part(source_doc.part.part_related_by(RT.FOOTNOTES))

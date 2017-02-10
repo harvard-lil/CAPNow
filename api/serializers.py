@@ -74,7 +74,7 @@ class CaseSerializer(serializers.ModelSerializer):
         proof_name = validated_data['manuscript'].name.replace('.docx', '.proof.docx')
         proof.docx.save(proof_name, proof_docx)
 
-        data = parse_elements(case=instance, proof=proof, source_path=proof_name, convert_to_xml=True, convert_to_html=True)
+        data = parse_elements(case=instance, proof=proof, source_path=proof_name)
 
         instance.name_abbreviation = data['casename'].db_name_abbreviation
         instance.name = data['casename'].db_name
