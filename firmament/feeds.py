@@ -14,7 +14,7 @@ class LatestEntriesFeed(Feed):
         return item.short_name
 
     def item_description(self, item):
-        return "%s | %s | %s" % (item.short_name, item.year, item.status)
+        return "%s | %s | %s" % (item.short_name, item.year, item.publication_status)
 
     def item_link(self, item):
         return "http://anastaisas-link-to-the-xml-version" #reverse('news-item', args=[item.pk])
