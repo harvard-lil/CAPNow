@@ -116,7 +116,7 @@ class Volume(models.Model):
 
     @property
     def published_cases(self):
-        return self.cases.filter(status="published")
+        return self.cases.filter(publication_status="published")
 
 class Court(models.Model):
     name = models.CharField(max_length=128, null=True)

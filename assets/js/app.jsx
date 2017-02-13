@@ -179,13 +179,13 @@ var Case = React.createClass({
   },
 
   onPublish: function(){
-    var oldState = this.state.status;
-    this.setState({status: "published"});
+    var oldState = this.state;
+    this.setState({publication_status: "published"});
     request.patch(this.endpointURL())
-      .send({status: "published"})
+      .send({publication_status: "published"})
       .end((err, res)=>{
         if(err){
-          this.setState({status: oldState});
+          this.setState({publication_status: oldState});
         }
       });
   },
@@ -197,7 +197,7 @@ var Case = React.createClass({
   },
 
   getInitialState: function () {
-			return {status: this.props.data.status};
+      return {publication_status: this.props.data};
   },
 
   render: function() {
@@ -212,9 +212,9 @@ var Case = React.createClass({
           <div className="col-sm-2"><a href={d.manuscript}>download manuscript</a></div>
           {getProofDivs(proof, this.endpointURL()+"proofs/")}
           <div className="col-sm-2">{
-            this.state.status == "draft" ?
+            this.state.publication_status == "draft" ?
               <button className="btn btn-sm btn-outline-primary" onClick={this.onPublish}>Publish</button> :
-              this.state.status
+              this.state.publication_status
           }</div>
           {/* <div className="col-sm-12"><button className="btn btn-sm btn-outline-danger" onClick={this.onDelete}>Delete</button></div> */}
         </div>
