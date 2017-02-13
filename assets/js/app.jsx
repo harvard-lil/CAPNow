@@ -197,7 +197,7 @@ var Case = React.createClass({
   },
 
   getInitialState: function () {
-      return {publication_status: this.props.data};
+      return {publication_status: this.props.data.publication_status};
   },
 
   render: function() {
