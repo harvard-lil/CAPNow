@@ -51,6 +51,9 @@ class Proof(models.Model):
                                     choices=(('pending', 'pending'), ('generated', 'generated'), ('failed', 'failed')),
                                     blank=True, null=True)
 
+    xml = models.FileField(blank=True, null=True)
+    html = models.FileField(blank=True, null=True)
+
     class Meta:
         ordering = ('-timestamp',)
 
@@ -69,13 +72,13 @@ class Proof(models.Model):
 
 
 class Series(models.Model):
-    short_name = models.CharField(max_length=255, unique=True)
+    name_abbreviation = models.CharField(max_length=255, unique=True)
 
     class Meta:
         verbose_name_plural = 'Series'
 
     def __str__(self):
-        return self.short_name
+        return self.name_abbreviation
 
 class Volume(models.Model):
     series = models.ForeignKey(Series, related_name='volumes')
@@ -113,18 +116,29 @@ class Volume(models.Model):
 
     @property
     def published_cases(self):
-        return self.cases.filter(status="published")
+        return self.cases.filter(publication_status="published")
 
+class Court(models.Model):
+    name = models.CharField(max_length=128, null=True)
+    name_abbreviation = models.CharField(max_length=64, null=True)
+    jurisdiction = models.CharField(max_length=24, null=True)
+
+class Judge(models.Model):
+    name = models.CharField(max_length=128)
 
 class Case(DeletableModel):
     volume = models.ForeignKey(Volume, related_name='cases')
-    page_number = models.IntegerField()
-    last_page_number = models.IntegerField(blank=True, null=True)
-    short_name = models.CharField(max_length=1024)
+    court = models.ForeignKey(Court, related_name='cases', blank=True, null=True)
+    name = models.CharField(max_length=1024, null=True)
+    name_abbreviation = models.CharField(max_length=256, null=True)
     year = models.IntegerField()
+    docket_number = models.CharField(max_length=24, null=True)
+    decision_date = models.DateTimeField(null=True)
+    first_page = models.IntegerField()
+    last_page = models.IntegerField(blank=True, null=True)
     manuscript = models.FileField()
     proofs = models.ManyToManyField(Proof, related_name='cases')
-    status = models.CharField(max_length=10,
+    publication_status = models.CharField(max_length=12,
                               default='draft',
                               choices=(('draft', 'draft'), ('published', 'published'), ('withdrawn', 'withdrawn')),
                               blank=True, null=True)
@@ -133,13 +147,16 @@ class Case(DeletableModel):
     objects = DeletableManager()
 
     def citation(self):
-        return "%s, %s %s-%s (%s)" % (self.short_name, self.volume, self.page_number, self.last_page_number or "?", self.year)
+        return "%s, %s %s-%s (%s)" % (self.name_abbreviation, self.volume, self.first_page, self.last_page or "?", self.year)
 
     def __str__(self):
         return self.citation()
 
     def update_last_page_number(self, proof):
         reader = PyPDF2.PdfFileReader(proof.pdf.file)
-        self.last_page_number = self.page_number + reader.getNumPages() - 1
+        self.last_page = self.first_page + reader.getNumPages() - 1
         self.save()
 
+    def update_values(self, data):
+        self.update(**kwargs)
+        self.save()

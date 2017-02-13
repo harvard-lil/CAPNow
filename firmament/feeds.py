@@ -12,7 +12,7 @@ class ExtendedRSSFeed(Rss201rev2Feed):
         attrs = super(ExtendedRSSFeed, self).root_attributes()
         attrs['xmlns:content'] = 'http://purl.org/rss/1.0/modules/content/'
         return attrs
-    
+
     def add_item_elements(self, handler, item):
         super(ExtendedRSSFeed, self).add_item_elements(handler, item)
 
@@ -33,22 +33,22 @@ class CaseFeed(Feed):
         extra.update({'content_encoded': self.item_case_content(item)})
         extra.update({'media': self.item_case_content(item)})
         return extra
-    
+
     def items(self):
-        return Case.objects.order_by('-year')[:500] 
+        return Case.objects.order_by('-year')[:500]
 
     def item_title(self, item):
-        return item.short_name
+        return item.name_abbreviation
 
     def item_subtitle(self, item):
-        return "%s | %s | %s" % (item.short_name, item.year, item.status)
+        return "%s | %s | %s" % (item.name_abbreviation, item.year, item.publication_status)
 
     def item_link(self, item):
-        return "http://anastaisas-link-to-the-xml-version" #TODO: reverse to this item!!
+        return "http://anastasias-link-to-the-xml-version" #TODO: reverse to this item!!
 
     def item_case_content(self, item):
         query_obj = Case.objects.get(pk=item.id)
-        full_text = "here we build whatever xml CAPDB needs. here's a title for now, %s" % query_obj.short_name
+        full_text = "here we build whatever xml CAPDB needs. here's a title for now, %s" % query_obj.name_abbreviation
 
         # TODO: we might need to escape our xml
         #return escape(full_text)
