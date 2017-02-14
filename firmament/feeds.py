@@ -1,7 +1,9 @@
-from django.contrib.syndication.views import Feed
-from firmament.models import Case
+from firmament.models import Case, Proof
 
+from django.contrib.syndication.views import Feed
 from django.utils.feedgenerator import Rss201rev2Feed
+
+from docx import Document
 
 class ExtendedRSSFeed(Rss201rev2Feed):
     # we need to jam things into our rss feed that are not found
@@ -44,13 +46,22 @@ class CaseFeed(Feed):
         return "%s | %s | %s" % (item.short_name, item.year, item.status)
 
     def item_link(self, item):
-        return "http://anastaisas-link-to-the-xml-version" #TODO: reverse to this item!!
+        return item.proofs.first().docx.url
 
     def item_case_content(self, item):
         query_obj = Case.objects.get(pk=item.id)
-        full_text = "here we build whatever xml CAPDB needs. here's a title for now, %s" % query_obj.short_name
 
-        # TODO: we might need to escape our xml
-        #return escape(full_text)
+        docs = ''
+        all = all_entries = Case.objects.all()
+        for case in all:
+            # TODO: below, if there are one2m, we should probably pick the best one? or send all of them?
+            for proof in case.proofs.all():
 
-        return full_text
+                doc = Document(proof.docx)
+                fullText = []
+                for para in doc.paragraphs:
+                    fullText.append(para.text)
+            
+                docs += '\n'.join(fullText)
+
+        return docs
