@@ -8,7 +8,7 @@ A secure and trusted platform that empowers courts to quickly and easily publish
 CAPNow requires Python 3.
 
 ### Setup your vitual env and install the requirements
-`mkvirtualenv capnow; pip install -r requirements.txt`
+`mkvirtualenv --python=/usr/local/bin/python3.4 capnow; pip install -r requirements.txt`
 
 ### Setup webpack
 `npm install`
@@ -27,8 +27,16 @@ SECRET_KEY = 'your key'
 CLOUDCONVERT_API_KEY = 'your key'
 ```
 
-### Create the DB and run Djangp
-`fab init_db; fab run`
+### Create the DB
+```
+mysql -u root -psomepasshere
+mysql> create database capnow character set utf8; grant all on capnow.* to capnow@'localhost' identified by 'capnow';
+mysql -u capnow -pcapnow
+mysql> show databases;
+```
+
+### Create the DB, load the developer data, and run Djangp
+`fab init_db; python manage.py loaddata fixtures/users.json; fab run`
 
 ### Yay!
 Open [the local address](http://localhost:9001/) in your browser and let the hacking begin!
