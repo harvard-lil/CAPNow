@@ -35,7 +35,7 @@ urlpatterns = [
     url(r'^latest/feed/$', CaseFeed()),
     url(r'^$', login_required(TemplateView.as_view(template_name='index.html')), name='home'),
     url(r'^public$', views.public, name='public'),
-    url(r'^$', TemplateView.as_view(template_name='index.html'), name='home'),
+    url(r'^$', TemplateView.as_view(template_name='index.html'), name='home')
 ]
 
 if settings.DEBUG:
