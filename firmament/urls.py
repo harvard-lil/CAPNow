@@ -13,21 +13,28 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
+
 from django.conf import settings
 from django.conf.urls import url, include
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic import TemplateView
-from firmament.feeds import LatestEntriesFeed
+from django.contrib.auth import views as auth_views
+from django.contrib.auth.decorators import login_required
 
+from firmament.feeds import CaseFeed
 
 from . import views
+
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^api/', include('api.urls', namespace='api')),
+    url(r'^login/$', auth_views.login, name='login'),
     url(r'^public$', views.public, name='public'),
-    url(r'^latest/feed/$', LatestEntriesFeed()),
+    url(r'^latest/feed/$', CaseFeed()),
+    url(r'^$', login_required(TemplateView.as_view(template_name='index.html')), name='home'),
+    url(r'^public$', views.public, name='public'),
     url(r'^$', TemplateView.as_view(template_name='index.html'), name='home')
 ]
 
