@@ -417,4 +417,4 @@ if __name__ == '__main__':
     # get case info from source path
     name_abbreviation, cite, year = re.match(r'(.*), (\d+ Mass. \d+) \((\d{4})\)', in_path.rsplit('/', 1)[-1]).groups()
 
-    convert(in_path, out_path, short_name, cite, year)
+    convert(in_path, out_path, name_abbreviation, cite, year)

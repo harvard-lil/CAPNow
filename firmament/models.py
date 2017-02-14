@@ -7,6 +7,7 @@ from django.utils import timezone
 from docx import RT
 from model_utils import FieldTracker
 from django.db import models
+from django.utils import timezone
 
 from scripts.convert import load_doc, load_part, save_part
 
@@ -127,6 +128,7 @@ class Judge(models.Model):
     name = models.CharField(max_length=128)
 
 class Case(DeletableModel):
+    updated_at = models.DateTimeField(auto_now_add=True)
     volume = models.ForeignKey(Volume, related_name='cases')
     court = models.ForeignKey(Court, related_name='cases', blank=True, null=True)
     name = models.CharField(max_length=1024, null=True)
@@ -160,3 +162,7 @@ class Case(DeletableModel):
     def update_values(self, data):
         self.update(**kwargs)
         self.save()
+
+    def save(self, *args, **kwargs):
+        self.updated_at = timezone.now()
+        super(Case, self).save(*args, **kwargs)

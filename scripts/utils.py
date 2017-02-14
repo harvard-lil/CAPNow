@@ -119,8 +119,13 @@ def get_paragraphs_with_style(paragraphs, style):
     return pars, par_num
 
 def get_docname_parts(docname):
+    docname = docname.replace('_', ' ')
     citation = re.search(r'\d+\s+\w+.\s+\d+', docname).group()
-    year = int(re.search(r'\(\d{4}\)\.proof\.docx$', docname).group()[1:].split(').proof.docx')[0])
+    try:
+        year = int(re.search(r'\(\d{4}\)\.proof\.docx$', docname).group()[1:].split(').proof.docx')[0])
+    except:
+        year = int(re.search(r'\d{4}', docname).group())
+        pass
     name_abbreviation = re.sub(',', '', docname.split(citation)[0].rstrip())
     return name_abbreviation, citation, year
 
@@ -158,7 +163,9 @@ def write_file(filename, case, data, filetype='xml'):
             headnotes=data['headnotes'].html,
             )
 
-    return ContentFile(content)
+    newfile = ContentFile(content)
+    newfile.name = filename
+    return newfile
 
 
 xml_template = string.Template("""<?xml version='1.0' encoding='utf-8'?>
