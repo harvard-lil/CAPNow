@@ -17,8 +17,8 @@ class ProofSerializer(serializers.ModelSerializer):
             "timestamp": {"read_only": True},
             "pdf": {"read_only": True},
             "pdf_status": {"read_only": True},
-            "xml": {"read_only": True},
-            "html": {"read_only": True},
+            "xml": {"required": False},
+            "html": {"required": False},
         }
 
 class CaseSerializer(serializers.ModelSerializer):
@@ -74,7 +74,7 @@ class CaseSerializer(serializers.ModelSerializer):
         proof_name = validated_data['manuscript'].name.replace('.docx', '.proof.docx')
         proof.docx.save(proof_name, proof_docx)
 
-        data = parse_elements(case=instance, proof=proof, source_path=proof_name)
+        data = parse_elements(proof=proof.docx, source_path=proof_name)
 
         instance.name_abbreviation = data['casename'].db_name_abbreviation
         instance.name = data['casename'].db_name
@@ -92,9 +92,7 @@ class CaseSerializer(serializers.ModelSerializer):
         proof.save()
 
         instance.proofs = [proof]
-
         instance.save()
-
 
         return instance
 

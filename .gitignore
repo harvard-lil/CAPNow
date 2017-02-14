@@ -11,3 +11,4 @@ package.json
 samples
 celerybeat-schedule
 assets/*
+docs/*

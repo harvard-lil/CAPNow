@@ -33,7 +33,7 @@ def run():
 def init_db():
     from firmament.models import Series
     local("python manage.py migrate")
-    Series(short_name="Mass.").save()
+    Series(name_abbreviation="Mass.").save()
 
 def test_front_matter():
     from firmament.models import Volume
