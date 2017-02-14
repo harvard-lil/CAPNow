@@ -1,35 +1,32 @@
-amqp==1.4.9
-anyjson==0.3.3
-billiard==3.3.0.23
-boto==2.42.0
-celery==3.1.23
-cloudconvert==1.0.0
-cssselect==1.0.1
-dj-database-url==0.4.1
 Django==1.9.8
-django-env-overrides==0.1.0
-django-environ==0.4.1
+
+# docx generation
+pyquery==1.2.13
+#python-docx
+-e git://github.com/jcushman/python-docx.git#egg=python-docx
+
+# API
 django-filter==0.13.0
-django-model-utils==2.5
-django-storages==1.4.1
-django-webpack-loader==0.3.0
 djangorestframework==3.3.3
 drf-nested-routers==0.11.1
-ecdsa==0.13
+Markdown==2.6.6
+
+django-model-utils==2.5     # tracking model field changes
+celery==3.1.23
+cloudconvert==1.0.0
+django-webpack-loader==0.3.0
+
+PyPDF2==1.26.0
+
+# deployment
+whitenoise==3.2
+dj-database-url==0.4.1
 Fabric3==1.11.1.post1
 gunicorn==19.6.0
-kombu==3.0.37
-lxml==3.7.2
-Markdown==2.6.6
-paramiko==1.18.1
 psycopg2==2.6.1
-pycrypto==2.6.1
-PyPDF2==1.26.0
-pyquery==1.2.13
--e git://github.com/jcushman/python-docx.git@0277629d319d6b3443643b8f5315d4b20f6cd5b3#egg=python_docx-master
-pytz==2016.10
+django-env-overrides==0.1.0
+
+# heroku
+django_storages==1.4.1
+boto==2.42.0
 redis==2.10.5
-requests==2.13.0
-six==1.10.0
-wheel==0.24.0
-whitenoise==3.2
