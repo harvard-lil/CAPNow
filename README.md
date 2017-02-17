@@ -35,7 +35,7 @@ mysql -u capnow -pcapnow
 mysql> show databases;
 ```
 
-### Create the DB, load the developer data, and run Djangp
+### Create the DB, load the developer data, and run Django
 `fab init_db; python manage.py loaddata fixtures/users.json; fab run`
 
 ### Yay!

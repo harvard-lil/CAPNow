@@ -150,7 +150,7 @@ def write_file(filename, case, data, filetype='xml'):
             categories=data['categories'].xml,
             headnotes=data['headnotes'].html,
             footnotes=data['footnotes'].xml,
-            )
+            ).encode("utf-8")
     elif filetype == 'html':
         content = html_template.substitute(
             casename=data['casename'].html,
@@ -161,7 +161,7 @@ def write_file(filename, case, data, filetype='xml'):
             casetext=data['casetext'].html,
             categories=data['categories'].html,
             headnotes=data['headnotes'].html,
-            )
+            ).encode("utf-8")
 
     newfile = ContentFile(content)
     newfile.name = filename
