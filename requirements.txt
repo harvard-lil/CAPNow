@@ -1,6 +1,5 @@
 amqp==1.4.9
 anyjson==0.3.3
-appdirs==1.4.0
 billiard==3.3.0.23
 boto==2.42.0
 celery==3.1.23
@@ -22,11 +21,9 @@ gunicorn==19.6.0
 kombu==3.0.37
 lxml==3.7.2
 Markdown==2.6.6
-packaging==16.8
 paramiko==1.18.1
 psycopg2==2.6.1
 pycrypto==2.6.1
-pyparsing==2.1.10
 PyPDF2==1.26.0
 pyquery==1.2.13
 -e git://github.com/jcushman/python-docx.git@0277629d319d6b3443643b8f5315d4b20f6cd5b3#egg=python_docx
