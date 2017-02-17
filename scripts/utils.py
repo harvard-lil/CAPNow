@@ -161,7 +161,7 @@ def write_file(filename, case, data, filetype='xml'):
             casetext=data['casetext'].html,
             categories=data['categories'].html,
             headnotes=data['headnotes'].html,
-            )
+            ).encode("utf-8")
 
     newfile = ContentFile(content)
     newfile.name = filename
