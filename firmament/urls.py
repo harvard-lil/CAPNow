@@ -35,6 +35,7 @@ urlpatterns = [
     url(r'^public$', login_required(views.public), name='public'),
     url(r'^latest/feed/$', login_required(CaseFeed())),
     url(r'^$', login_required(TemplateView.as_view(template_name='index.html')), name='home'),
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]
 
 if settings.DEBUG:

@@ -3,7 +3,7 @@ from tempfile import SpooledTemporaryFile
 from PyPDF2 import PdfFileMerger
 from django.http import HttpResponse
 from wsgiref.util import FileWrapper
-from rest_framework import viewsets, renderers
+from rest_framework import viewsets, renderers, permissions
 from rest_framework.decorators import detail_route
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.response import Response
@@ -18,7 +18,7 @@ from scripts.utils import write_file
 class VolumeViewSet(viewsets.ModelViewSet):
     queryset = Volume.objects.all()
     serializer_class = VolumeSerializer
-
+    permission_classes = (permissions.IsAuthenticated,)
 
     @detail_route(renderer_classes=[renderers.StaticHTMLRenderer])
     def export(self, request, *args, **kwargs):
@@ -43,6 +43,7 @@ class CaseViewSet(viewsets.ModelViewSet):
     queryset = Case.objects.all()
     serializer_class = CaseSerializer
     parser_classes = (MultiPartParser, FormParser, JSONParser)
+    permission_classes = (permissions.IsAuthenticated,)
 
     def partial_update(self, request, *args, **kwargs):
         if 'proof' in request.data:
@@ -62,6 +63,7 @@ class CaseViewSet(viewsets.ModelViewSet):
 class NestedProofViewSet(viewsets.ModelViewSet):
     queryset = Proof.objects.all()
     serializer_class = ProofSerializer
+    permission_classes = (permissions.IsAuthenticated,)
 
     related_name = None
     parent_pk = None
@@ -90,15 +92,18 @@ class NestedProofViewSet(viewsets.ModelViewSet):
 
 class FrontMatterViewSet(NestedProofViewSet):
     related_name = 'front_matter_volumes'
+    permission_classes = (permissions.IsAuthenticated,)
 
     def add_blank_instance(self):
         self.instance = Volume.objects.get(pk=self.parent_pk).generate_front_matter()
 
 class BackMatterViewSet(NestedProofViewSet):
     related_name = 'back_matter_volumes'
+    permission_classes = (permissions.IsAuthenticated,)
 
 class CaseProofViewSet(NestedProofViewSet):
     related_name = 'cases'
+    permission_classes = (permissions.IsAuthenticated,)
 
     def create(self, request, *args, **kwargs):
         docx = request.data.get('docx')
