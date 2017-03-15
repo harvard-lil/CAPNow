@@ -13,8 +13,8 @@
           <div class="row">
             <div class="col-sm-6">{{ case.citation }}</div>
             <div class="col-sm-2"><a href="{{ case.proofs.all.0.pdf.url }}">as PDF</a></div>
-            <div class="col-sm-2"><a href="{{ case.proofs.all.0.pdf.url }}">as HTML</a></div>
-            <div class="col-sm-2"><a href="{{ case.proofs.all.0.pdf.url }}">as XML</a></div>
+            <div class="col-sm-2"><a href="{{ case.proofs.all.0.html.url }}">as HTML</a></div>
+            <div class="col-sm-2"><a href="{{ case.proofs.all.0.xml.url }}">as XML</a></div>
           </div>
         {% endfor %}
       {% endfor %}
