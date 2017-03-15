@@ -31,11 +31,11 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^api/', include('api.urls', namespace='api')),
     url(r'^login/$', auth_views.login, name='login'),
-    url(r'^public$', views.public, name='public'),
-    url(r'^latest/feed/$', CaseFeed()),
+    url(r'^logout/$', auth_views.logout, name='logout'),
+    url(r'^public$', login_required(views.public), name='public'),
+    url(r'^latest/feed/$', login_required(CaseFeed())),
     url(r'^$', login_required(TemplateView.as_view(template_name='index.html')), name='home'),
-    url(r'^public$', views.public, name='public'),
-    url(r'^$', TemplateView.as_view(template_name='index.html'), name='home')
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]
 
 if settings.DEBUG:
