@@ -64,7 +64,6 @@ class CaseSerializer(serializers.ModelSerializer):
                         year=year, proof_docx=proof_docx)
 
     def create(self, validated_data):
-        print("CALLING CREATE")
         validated_data['volume'].save()
         proof_docx = validated_data.pop('proof_docx')
 
@@ -74,7 +73,6 @@ class CaseSerializer(serializers.ModelSerializer):
         proof = Proof()
         proof_name = validated_data['manuscript'].name.replace('.docx', '.proof.docx')
         proof.docx.save(proof_name, proof_docx)
-        print("CREATING DOCX", proof.docx, proof.xml, proof.html)
 
         data = parse_elements(proof=proof.docx, source_path=proof_name)
 
@@ -86,13 +84,11 @@ class CaseSerializer(serializers.ModelSerializer):
         proof_name = proof_name.replace('.docx', '.xml')
         proof_xml = write_file(proof_name, instance, data, filetype='xml')
         proof.xml.save(proof_name, proof_xml)
-        print("CREATING XML", proof.docx, proof.xml, proof.html)
 
         # write html
         proof_name = proof_name.replace('.xml', '.html')
         proof_html = write_file(proof_name, instance, data, filetype='html')
         proof.html.save(proof_name, proof_html)
-        print("CREATING HTML", proof.docx, proof.xml, proof.html)
 
         proof.save(generate_pdf=True)
 
