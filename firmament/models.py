@@ -58,10 +58,9 @@ class Proof(models.Model):
     class Meta:
         ordering = ('-timestamp',)
 
-    def save(self, *args, **kwargs):
-        new_record = not self.pk
+    def save(self, generate_pdf=False, *args, **kwargs):
         super(Proof, self).save(*args, **kwargs)
-        if new_record:
+        if generate_pdf:
             from .tasks import generate_proof_pdf
             print("CALLING TASK")
             generate_proof_pdf.apply_async([self.pk])
