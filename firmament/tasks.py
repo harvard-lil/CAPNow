@@ -12,7 +12,6 @@ from firmament.models import Proof
 
 @shared_task
 def generate_proof_pdf(proof_id):
-    print("TASK CALLED")
     proof = Proof.objects.get(pk=proof_id)
     try:
         if not proof.docx:
