@@ -89,10 +89,12 @@ class CaseSerializer(serializers.ModelSerializer):
         proof_name = proof_name.replace('.xml', '.html')
         proof_html = write_file(proof_name, instance, data, filetype='html')
         proof.html.save(proof_name, proof_html)
-        proof.save()
+
+        proof.save(generate_pdf=True)
 
         instance.proofs = [proof]
         instance.save()
+
 
         return instance
 
