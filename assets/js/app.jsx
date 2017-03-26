@@ -27,9 +27,9 @@ function getProofDivs(proof, onDropURL){
 
   return (
     [
-      <div className="col-sm-2">{ proof ? <a href={proof.docx}>download proof .docx</a> : "" }</div>,
-      <div className="col-sm-2">{ proof ? <a href={proof.xml}>download proof .xml</a> : "" }</div>,
-      <div className="col-sm-2">{ proof ? <a href={proof.html}>download proof .html</a> : "" }</div>,
+      <div className="col-sm-2">{ (proof && proof.docx) ? <a href={proof.docx}>download proof .docx</a> : "" }</div>,
+      <div className="col-sm-2">{ (proof && proof.xml) ? <a href={proof.xml}>download proof .xml</a> : "" }</div>,
+      <div className="col-sm-2">{ (proof && proof.html) ? <a href={proof.html}>download proof .html</a> : "" }</div>,
       <div className="col-sm-2">
         { proof ?
             proof.pdf_status == "generated" ?
