@@ -9,5 +9,4 @@ webpack-stats-prod.json
 package.json
 samples
 celerybeat-schedule
-assets/*
 docs/*
