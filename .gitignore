@@ -1,6 +1,5 @@
 venv
 *.pyc
-staticfiles
 firmament/settings/settings.py
 node_modules
 media
