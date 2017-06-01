@@ -9,14 +9,31 @@
     <meta name="robots" content="noindex">
     <meta name="description" content="{% block meta_description %}Explore American Caselaw{% endblock meta_description %}">
 
+    <link rel="shortcut icon" type="image/png" href="{% static "img/logo-small-blue.png" %}" sizes="32x32">
+
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css">
-
-
     <link rel="stylesheet" href="{% static "stylesheets/base.css" %}" />
   </head>
+  <header class="header">
+    <div class=" container-fluid">
+        <div class="row header">
+            <div class="col-6">
+                <a href="/">
+                    <img class="header-logo" src="{% static "img/logo-small-blue.png" %}" alt="CAP Logo"></img>
+                </a>
+                <span class="header-text">CAP Now</span>
+            </div>
+            <div class="col-6">
+                <a href="http://lil.law.harvard.edu" target="_blank">
+                    <img class="lil-logo" src="{% static "img/LIL-logo.png" %}" alt="Library Innovation Lab"></img>
+                </a>
+            </div>
+        </div>
+    </div>
+    </header>
+
   <body>
   <div class="container">
-
       <div class="row header">
           <div class="col-6">
               <a href="/">
