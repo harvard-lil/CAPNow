@@ -6,7 +6,7 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 module.exports = {
   context: __dirname,
   entry: [
-      'js/index',
+      '/Users/phillipsm/dev_area/CAPNow/assets/js/index',
   ],
   output: {
       path: path.resolve('./assets/bundles/'),
@@ -17,33 +17,40 @@ module.exports = {
     new ExtractTextPlugin('[name].css')
   ],
 
-  postcss: [
-    autoprefixer({
-      browsers: ['last 2 versions']
-    })
-  ],
 
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.jsx?$/,
         exclude: /node_modules/,
-        loaders: ['babel?presets[]=es2015&presets[]=react']
+        use: [
+                {
+                    loader: "babel-loader",
+                    options: {
+                      presets: ['react', 'es2015']
+                    }
+                }
+            ],
+
       },
       {
-        test: /\.scss$/,
-        loader: ExtractTextPlugin.extract('style-loader', [
-          'css-loader',
-          'postcss-loader',
-          'sass-loader?includePaths[]=' + path.resolve(__dirname, './assets')
-        ].join('!'))
-      }
-    ],
-  },
+        test: /\.scss?$/,
+        use: [{
+                loader: "style-loader" // creates style nodes from JS strings
+            }, {
+                loader: "css-loader" // translates CSS into CommonJS
+            }, {
+                loader: "sass-loader" // compiles Sass to CSS
+            }]
+        }
+    ]
+}, // module config end
 
   resolve: {
-    modulesDirectories: ['node_modules', 'bower_components'],
-    extensions: ['', '.js', '.jsx', '.scss'],
-    root: [path.join(__dirname, './assets')]
-  },
+    extensions: ['.js', '.jsx', '.scss'],
+    modules: [
+        path.join(__dirname, "./assets"),
+        "node_modules"
+    ]
+    }
 }

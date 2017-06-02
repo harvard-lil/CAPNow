@@ -10,5 +10,7 @@
     var createCaseURL = '{% url "api:cases-list" %}';
     var volumeURL = '{% url "api:volumes-list" %}';
   </script>
-  {% render_bundle 'main' %}
+  {% block scripts %}
+    {% render_bundle 'main' %}
+  {% endblock %}
 {% endblock %}
