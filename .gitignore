@@ -1,6 +1,5 @@
 venv
 *.pyc
-staticfiles
 firmament/settings/settings.py
 node_modules
 media
@@ -10,5 +9,4 @@ webpack-stats-prod.json
 package.json
 samples
 celerybeat-schedule
-assets/*
 docs/*

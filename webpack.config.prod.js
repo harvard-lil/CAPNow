@@ -16,7 +16,7 @@ config.plugins = config.plugins.concat([
   }}),
 
   // keeps hashes consistent between compilations
-  new webpack.optimize.OccurenceOrderPlugin(),
+  new webpack.optimize.OccurrenceOrderPlugin(),
 
   // minify
   new webpack.optimize.UglifyJsPlugin({

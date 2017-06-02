@@ -41,9 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'firmament',
-
     'rest_framework',
-
     'webpack_loader',
 ]
 
