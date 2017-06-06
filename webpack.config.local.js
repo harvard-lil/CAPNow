@@ -18,6 +18,6 @@ config.plugins = config.plugins.concat([
 ]);
 
 // pass the output from babel loader to react-hot loader
-config.module.loaders[0].loaders.unshift('react-hot');
+// config.module.loaders[0].loaders.unshift('react-hot');
 
 module.exports = config;
