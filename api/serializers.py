@@ -90,7 +90,7 @@ class CaseSerializer(serializers.ModelSerializer):
         proof_html = write_file(proof_name, instance, data, filetype='html')
         proof.html.save(proof_name, proof_html)
 
-        proof.save(generate_pdf=True)
+        proof.save()
 
         instance.proofs = [proof]
         instance.save()
