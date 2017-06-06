@@ -58,13 +58,14 @@ class Proof(models.Model):
     class Meta:
         ordering = ('-timestamp',)
 
-    def save(self, *args, **kwargs):
+    def save(self, generate_pdf=False, *args, **kwargs):
         super(Proof, self).save(*args, **kwargs)
-        from .tasks import generate_proof_pdf
-        print("CALLING TASK")
-        generate_proof_pdf.apply_async([self.pk])
-        if settings.CELERY_ALWAYS_EAGER:
-            self.refresh_from_db()
+        if generate_pdf:
+            from .tasks import generate_proof_pdf
+            print("CALLING TASK")
+            generate_proof_pdf.apply_async([self.pk])
+            if settings.CELERY_ALWAYS_EAGER:
+                self.refresh_from_db()
 
     def __str__(self):
         return self.docx.name
