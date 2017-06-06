@@ -13,8 +13,6 @@ CAPNow requires Python 3.
 ### Setup webpack
 `npm install`
 
-If you change JS or CSS, then before commiting, run `npm run build` to build the production assets.
-
 ### Local settings file
 Setup your local settings file
 `cd settings; touch settings.py`
@@ -27,19 +25,16 @@ SECRET_KEY = 'your key'
 CLOUDCONVERT_API_KEY = 'your key'
 ```
 
-### Create the DB
-```
-mysql -u root -psomepasshere
-mysql> create database capnow character set utf8; grant all on capnow.* to capnow@'localhost' identified by 'capnow';
-mysql -u capnow -pcapnow
-mysql> show databases;
-```
-
 ### Create the DB, load the developer data, and run Django
-`fab init_db; python manage.py loaddata fixtures/users.json; fab run`
+```
+fab init_db
+fab run
+```
 
 ### Yay!
 Open [the local address](http://localhost:9001/) in your browser and let the hacking begin!
+
+Default admin user from users.json is `admin` - `passpass`.
 
 
 ## License

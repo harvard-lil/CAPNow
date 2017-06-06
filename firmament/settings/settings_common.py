@@ -165,3 +165,6 @@ WEBPACK_LOADER = {
 }
 
 LOGIN_URL = '/login/'
+
+# set this in settings.py to allow creation of proofs
+CLOUDCONVERT_API_KEY = None

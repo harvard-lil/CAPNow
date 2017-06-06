@@ -33,6 +33,7 @@ def run():
 def init_db():
     from firmament.models import Series
     local("python manage.py migrate")
+    local("python manage.py loaddata fixtures/users.json")
     Series(name_abbreviation="Mass.").save()
 
 def test_front_matter():
