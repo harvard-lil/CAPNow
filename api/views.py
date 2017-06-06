@@ -49,7 +49,7 @@ class CaseViewSet(viewsets.ModelViewSet):
         if 'proof' in request.data:
             instance = self.get_object()
             proof = Proof(docx=request.data['proof'])
-            proof.save(generate_pdf=True)
+            proof.save()
             instance.proofs.add(proof)
             return Response(self.get_serializer(instance).data)
 
