@@ -6,7 +6,7 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 module.exports = {
   context: __dirname,
   entry: [
-      '/Users/phillipsm/dev_area/CAPNow/assets/js/index',
+      './assets/js/index',
   ],
   output: {
       path: path.resolve('./assets/bundles/'),
