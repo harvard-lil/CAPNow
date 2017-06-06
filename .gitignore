@@ -4,11 +4,13 @@ firmament/settings/settings.py
 node_modules
 media
 db.sqlite3
-webpack-stats.json
-webpack-stats-prod.json
 package.json
 samples
 celerybeat-schedule
 docs/*
 .idea
 
+# prod build assets
+assets/dist
+webpack-stats.json
+webpack-stats-prod.json
