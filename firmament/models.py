@@ -3,7 +3,6 @@ import PyPDF2
 
 from django.conf import settings
 from django.core.files.base import ContentFile
-from django.utils import timezone
 from docx import RT
 from model_utils import FieldTracker
 from django.db import models
