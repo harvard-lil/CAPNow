@@ -44,7 +44,7 @@ class CaseSerializer(serializers.ModelSerializer):
         # get case info from file name
         m = re.match(r'(.+?), (\d+) (.*?) (\d+) \((\d{4})\).docx', manuscript.name)
         if not m:
-            raise serializers.ValidationError("File name must match this pattern: 123 Mass. 456 (2015).docx")
+            raise serializers.ValidationError("File name must match this pattern: Smith v. Jones, 123 Mass. 456 (2015).docx")
         name_abbreviation, volume_number, series_name, first_page, year = m.groups()
 
         try:
