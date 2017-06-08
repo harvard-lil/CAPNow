@@ -3,6 +3,7 @@ import PyPDF2
 
 from django.conf import settings
 from django.core.files.base import ContentFile
+from django.utils.functional import cached_property
 from docx import RT
 from model_utils import FieldTracker
 from django.db import models
@@ -165,3 +166,7 @@ class Case(DeletableModel):
     def save(self, *args, **kwargs):
         self.updated_at = timezone.now()
         super(Case, self).save(*args, **kwargs)
+
+    @cached_property
+    def current_proof(self):
+        return self.proofs.first()

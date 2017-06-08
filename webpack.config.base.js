@@ -27,7 +27,10 @@ module.exports = {
                 {
                     loader: "babel-loader",
                     options: {
-                      presets: ['react', 'es2015']
+                      presets: ['react', 'es2015', 'stage-0'],
+                      plugins: [
+                        require('babel-plugin-transform-class-properties'),  // support `onDelete = () => {` syntax so `this` works in react class methods
+                      ]
                     }
                 }
             ],

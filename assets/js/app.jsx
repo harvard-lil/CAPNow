@@ -4,6 +4,7 @@ var React = require('react');
 var Dropzone = require('react-dropzone');
 var request = require('superagent');
 require('superagent-django-csrf');
+import update from 'immutability-helper';
 
 // monkey-patch request with universal settings
 var _request_end = request.Request.prototype.end;
@@ -28,8 +29,8 @@ function getProofDivs(proof, onDropURL){
   return (
     [
       <div className="col-sm-2">{ (proof && proof.docx) ? <a href={proof.docx}>download proof .docx</a> : "" }</div>,
-      <div className="col-sm-2">{ (proof && proof.xml) ? <a href={proof.xml}>download proof .xml</a> : "" }</div>,
-      <div className="col-sm-2">{ (proof && proof.html) ? <a href={proof.html}>download proof .html</a> : "" }</div>,
+      //<div className="col-sm-2">{ (proof && proof.xml) ? <a href={proof.xml}>download proof .xml</a> : "" }</div>,
+      //<div className="col-sm-2">{ (proof && proof.html) ? <a href={proof.html}>download proof .html</a> : "" }</div>,
       <div className="col-sm-2">
         { proof ?
             proof.pdf_status == "generated" ?
@@ -58,42 +59,47 @@ function getProofDivs(proof, onDropURL){
   );
 }
 
-var VolumeBox = React.createClass({
-  loadVolumesFromServer: function() {
+function updateState(component, changes){
+  // see https://github.com/kolodny/immutability-helper#available-commands for format of `changes`
+  component.setState(update(component.state, changes));
+}
+
+class VolumeBox extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {data: []};
+  }
+
+  loadVolumesFromServer = () =>  {
     request.get(this.props.url)
       .end((err, res)=>{
       if(!err){
-        this.loadInterval && this.setState({data: res.body});
+        this.loadInterval && updateState(this, {data: {$set: res.body}});
       }
     });
-  },
-  updateStateData: (data) => {
-    this.setState({data: data})
-  },
-  getInitialState: function() {
-    return {data: []};
-  },
-  componentDidMount: function() {
+  }
+
+  componentDidMount = () => {
     this.loadVolumesFromServer();
-    this.loadInterval = setInterval(this.loadVolumesFromServer, this.props.pollInterval);
-  },
-  componentWillUnmount () {
+    this.loadInterval = setInterval(this.loadVolumesFromServer.bind(this), this.props.pollInterval);
+  }
+  componentWillUnmount = () => {
       this.loadInterval && clearInterval(this.loadInterval);
       this.loadInterval = false;
-  },
-  render: function() {
+  }
+  render() {
     return (
       <div className="volumeBox">
-        <CaseForm updateStateData={this.updateStateData}/>
+        <CaseForm />
 
         <VolumeList data={this.state.data} />
       </div>
     );
   }
-});
+}
 
-var VolumeList = React.createClass({
-  render: function() {
+class VolumeList extends React.Component {
+  render() {
     var volumeNodes = this.props.data.map(function(volume) {
       return (
         <Volume key={volume.id} data={volume}/>
@@ -112,23 +118,23 @@ var VolumeList = React.createClass({
       </div>
     );
   }
-});
+}
 
-var Volume = React.createClass({
-  endpointURL: function(){
+class Volume extends React.Component {
+  endpointURL = () => {
     return volumeURL+this.props.data.id+"/";
-  },
+  }
 
-  generateFrontMatter: function(){
+  generateFrontMatter = () => {
     request.post(this.endpointURL()+"front_matter_proofs/")
       .end();
-  },
+  }
 
-  exportVolume: function(){
+  exportVolume = () => {
     window.open(this.endpointURL()+"export/", "_blank");
-  },
+  }
 
-  render: function() {
+  render() {
     var caseNodes = this.props.data.cases.map(function(caseData) {
       return (
         <Case key={caseData.id} data={caseData}/>
@@ -171,14 +177,19 @@ var Volume = React.createClass({
       </div>
     );
   }
-});
+}
 
-var Case = React.createClass({
-  endpointURL: function(){
+class Case extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {publication_status: this.props.data.publication_status};
+  }
+
+  endpointURL = () => {
     return createCaseURL+this.props.data.id+"/";
-  },
+  }
 
-  onPublish: function(){
+  onPublish = () => {
     var oldState = this.state;
     this.setState({publication_status: "published"});
     request.patch(this.endpointURL())
@@ -188,19 +199,15 @@ var Case = React.createClass({
           this.setState({publication_status: oldState});
         }
       });
-  },
+  }
 
-  onDelete: function(){
+  onDelete = () => {
     request.delete(this.endpointURL())
       .send()
       .end();
-  },
+  }
 
-  getInitialState: function () {
-      return {publication_status: this.props.data.publication_status};
-  },
-
-  render: function() {
+  render() {
     var d = this.props.data;
     var proof = d.proofs[0];
     return (
@@ -211,32 +218,45 @@ var Case = React.createClass({
         <div className="row">
           <div className="col-sm-2"><a href={d.manuscript}>download manuscript</a></div>
           {getProofDivs(proof, this.endpointURL()+"proofs/")}
-          <div className="col-sm-2">{
+          <div className="col-sm-1">{
             this.state.publication_status == "draft" ?
               <button className="btn btn-sm btn-outline-primary" onClick={this.onPublish}>Publish</button> :
               this.state.publication_status
           }</div>
-          {/* <div className="col-sm-12"><button className="btn btn-sm btn-outline-danger" onClick={this.onDelete}>Delete</button></div> */}
+          <div className="col-sm-1"><button className="btn btn-sm btn-outline-danger" onClick={this.onDelete.bind(this)}>Delete</button></div>
         </div>
       </div>
     );
   }
-});
+}
 
-var CaseForm = React.createClass({
-  getInitialState: function () {
-    return {
-      files: []
-    };
-  },
+class CaseForm extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {files: []};
+    console.log("0", this.props);
+  }
 
-  onDrop: function(files){
+  setErrorMessage = (message) => {
+    updateState(this, {errorMessage: {$set: message}});
+  }
+
+  onDrop = (files) => {
+    this.setErrorMessage(null);
     request.post(createCaseURL)
       .attach("manuscript", files[0])
-      .end();
-  },
+      .end((err, res) => {
+        if(err){
+          this.setErrorMessage("Error uploading case: "+res.body.non_field_errors[0]);
+        }
+      });
+  }
 
-  render: function () {
+  onCloseMessage = () => {
+    this.setErrorMessage(null);
+  }
+
+  render() {
     return (
       <div className="caseForm">
 
@@ -244,7 +264,7 @@ var CaseForm = React.createClass({
           <div className="col-lg-12" style={{padding:'3em'}}>
             <Dropzone
               ref="dropzone"
-              onDrop={this.onDrop}
+              onDrop={this.onDrop.bind(this)}
               multiple={false}
               accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
               disablePreview={true}
@@ -261,15 +281,26 @@ var CaseForm = React.createClass({
             </div> : null}
           </div>
         </div>
+
+        {
+          this.state.errorMessage ?
+            <div className="row">
+              <div className="alert alert-danger alert-dismissible fade show w-100" role="alert">
+                <button type="button" className="close" onClick={this.onCloseMessage.bind(this)} data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+                {this.state.errorMessage}
+              </div>
+            </div>
+            : ""
+        }
       </div>
     );
   }
-});
+}
 
-module.exports = React.createClass({
-   render: function(){
-     return (
-       <VolumeBox url={volumeURL} pollInterval={2000} />
-     );
-   }
-});
+module.exports = function(props) {
+  return (
+    <VolumeBox url={volumeURL} pollInterval={2000}/>
+  );
+}

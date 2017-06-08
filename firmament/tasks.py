@@ -19,6 +19,8 @@ def generate_proof_pdf(proof_id):
 
         print("Converting proof id=%s, file=%s to PDF." % (proof.id, proof.docx.name))
 
+        if not settings.CLOUDCONVERT_API_KEY:
+            raise Exception("Configuration error: CLOUDCONVERT_API_KEY must be set to convert files")
         api = cloudconvert.Api(settings.CLOUDCONVERT_API_KEY)
 
         # convert proof.docx to a named BufferedReader by writing to temp dir -- required for cloudconvert
