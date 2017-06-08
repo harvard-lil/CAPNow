@@ -13,7 +13,7 @@ config.output.publicPath = 'http://localhost:3000/assets/bundles/';
 
 config.plugins = config.plugins.concat([
   new webpack.HotModuleReplacementPlugin(),
-  new webpack.NoErrorsPlugin(), // don't reload if there is an error
+  new webpack.NoEmitOnErrorsPlugin(), // don't reload if there is an error
   new BundleTracker({filename: './webpack-stats.json'}),
 ]);
 
