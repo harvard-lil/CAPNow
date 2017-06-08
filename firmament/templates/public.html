@@ -4,7 +4,8 @@
 {% block content %}
   <div id="content">
     <div class="row">
-      <h2>Decisions of the Massachusetts Supreme Judicial Court</h2>
+      <div class="col-sm-12"><h2>Decisions of the Massachusetts Supreme Judicial Court</h2></div>
+    </div>
       {% for volume in volumes %}
         <div class="row">
           <div class="col-sm-12"><h3>{{ volume }}</h3></div>
@@ -12,9 +13,21 @@
         {% for case in volume.published_cases %}
           <div class="row">
             <div class="col-sm-6">{{ case.citation }}</div>
-            <div class="col-sm-2"><a href="{{ case.proofs.all.0.pdf.url }}">as PDF</a></div>
-            <div class="col-sm-2"><a href="{{ case.proofs.all.0.html.url }}">as HTML</a></div>
-            <div class="col-sm-2"><a href="{{ case.proofs.all.0.xml.url }}">as XML</a></div>
+            <div class="col-sm-2">
+              {% if case.current_proof and case.current_proof.pdf %}
+                <a href="{{ case.current_proof.pdf.url }}">as PDF</a>
+              {% endif %}
+            </div>
+            <div class="col-sm-2">
+              {% if case.current_proof and case.current_proof.html %}
+                <a href="{{ case.current_proof.html.url }}">as HTML</a>
+              {% endif %}
+            </div>
+            <div class="col-sm-2">
+              {% if case.current_proof and case.current_proof.xml %}
+                <a href="{{ case.current_proof.xml.url }}">as XML</a>
+              {% endif %}
+            </div>
           </div>
         {% endfor %}
       {% endfor %}
